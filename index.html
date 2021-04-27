@@ -60,7 +60,7 @@
 
             // Begin MIDI loader widger
             MIDI.loader = new widgets.Loader({
-                message: "Loading: Keyboard..."
+                message: "Loading Keyboard..."
             });
             
             function smoothstep(a,b,x)
@@ -82,9 +82,10 @@
                 this.key_max_rotation = 0.72;
                 this.octave = 1;
                 this.song = "Roundmidnight.mid";
-                this.monochrome = [ 255, 0, 0, 1.0 ];
+                this.monochrome = [ 128, 0, 255, 1.0 ];
                 this.chromatic = false;
                 this.color_by_fifths = false;
+                this.gui;
                 this.play = function()
                     {
                         MIDI.Player.resume();
@@ -240,8 +241,7 @@
             const noteToColor = (a) => {
                 return colors[a%colors.length];
             }
-            function update_key( obj, delta )
-            {
+            function update_key( obj, delta ){
                 if (obj.keyState == keyState.note_on)
                 {
                     obj.rotation.x = mix(-Math.PI/4.0, -controls.key_max_rotation, smoothstep(0.0, 1.0, controls.key_attack_time*obj.clock.getElapsedTime()));
@@ -256,7 +256,7 @@
                         obj.material.color = new THREE.Color(noteToColor(obj.id/2));
                     }
                     if (controls.color_by_fifths){
-                        obj.material.color = new THREE.Color(noteToColor(5*obj.id/2));
+                        obj.material.color = new THREE.Color(noteToColor(7*obj.id/2));
                     }
                 }
                 else if (obj.keyState == keyState.note_off)
@@ -348,11 +348,31 @@
                     }else {
                         controls.octave=1;
                     }
+                    let trollers = controls.gui.__controllers;
+                    for (let c of trollers){
+                        if (c.property=='octave'){
+                            c.setValue(controls.octave);
+                        }
+                    }
+                    releaseKeys();
                 }
             }
-
+            const releaseKeys = () => {
+                console.log('release keys');
+                for (keyCode in keys_down){  
+                    var note = keyCode_to_note(keyCode);
+                    key_status(note, keyState.note_off);
+                }        
+            }
+            window.onblur = function(){
+                console.log('blurred');
+                releaseKeys();
+            }
             window.onkeydown = function(ev)
             {
+                if (ev.keyCode == 9) {  //tab pressed
+                    ev.preventDefault(); // stops its action
+                }
                 if (keys_down[ev.keyCode] != true)
                 {
                     var note = keyCode_to_note(ev.keyCode);
@@ -435,23 +455,16 @@
                                     "No. 2 - Oriental, Granados": "gra_esp_2.mid",
                                     "Bohemian Rhapsody, Queen": "bohemian1.mid",                                    
                                   };
-                    var gui = new dat.GUI({ width:300});
+                    var gui = new dat.GUI({ width:250,hideable: false});
+                    controls.gui = gui;
                     //gui.add(controls, 'key_attack_time', 2.0 , 40.0);
                     //gui.add(controls, 'key_max_rotation',0.2 , 1.0);                             
 
 
                     // make sure to remove any key pressed when changing the octave
-                    var octave = gui.add(controls, 'octave',0 , 3).step(1);
                     gui.add(controls, 'key_attack_time',1, 10).step(1);
-                    octave.onChange(function(value)
-                                    {
-                                        for (keyCode in keys_down)
-                                        {  
-                                            var note = keyCode_to_note(keyCode);
-                                            key_status(note, keyState.note_off);
-                                        }
-                                        
-                                    });
+                    var octave = gui.add(controls, 'octave',0 , 3).step(1);
+                    octave.onChange(releaseKeys());
                     var keyColors = gui.addFolder('Key Colors');
                     var noteOnColorControl = keyColors.addColor(controls, 'monochrome');
                     noteOnColorControl.onChange(function(value)
@@ -474,7 +487,6 @@
             };            
 
             window.addEventListener( 'resize', on_window_resize, false );
-
         </script>
 
     <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
