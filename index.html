@@ -79,7 +79,7 @@
             {
                 this.key_attack_time = 9.0;
                 this.key_max_rotation = 0.72;
-                this.octave = 2;
+                this.octave = 1;
                 this.song = "game_of_thrones.mid";
                 this.noteOnColor = [ 255, 0, 0, 1.0 ];
                 this.play = function()
@@ -277,7 +277,8 @@
             function keyCode_to_note( keyCode)
             {
                 var note = -1;
-                //-----------------------------------
+                //
+                /*-----------------------------------
                 if(   keyCode==90 )  note= 0; // C 0
                 if(   keyCode==83 )  note= 1; // C#0
                 if(   keyCode==88 )  note= 2; // D 0
@@ -315,7 +316,53 @@
                 if(   keyCode==187 ) note=30; // F#2
                 if(   keyCode==221 ) note=31; // G 2
                 //-----------------------------------
-
+                //
+                */
+                /*
+                if(keyCode==16) note=5;
+                if(keyCode==65) note=6;
+                if(keyCode==90) note=7;
+                if(keyCode==83) note=8;
+                if(keyCode==88) note=9;
+                if(keyCode==68) note=10;
+                if(keyCode==67) note=11;
+                if(keyCode==86) note=12;
+                if(keyCode==71) note=13;
+                if(keyCode==66) note=14;
+                if(keyCode==72) note=15;
+                if(keyCode==78) note=16;
+                if(keyCode==77) note=17;
+                if(keyCode==75) note=18;
+                if(keyCode==188) note=19;
+                if(keyCode==76) note=20;
+                if(keyCode==190) note=21;
+                if(keyCode==186) note=22;
+                if(keyCode==191) note=23;
+                if(keyCode==9) note=24;
+                if(keyCode==49) note=25;
+                if(keyCode==81) note=26;
+                if(keyCode==50) note=27;
+                if(keyCode==87) note=28;
+                if(keyCode==69) note=29;
+                if(keyCode==52) note=30;
+                if(keyCode==82) note=31;
+                if(keyCode==53) note=32;
+                if(keyCode==84) note=33;
+                if(keyCode==54) note=34;
+                if(keyCode==89) note=35;
+                if(keyCode==85) note=36;
+                if(keyCode==56) note=37;
+                if(keyCode==73) note=38;
+                if(keyCode==57) note=39;
+                if(keyCode==79) note=40;
+                if(keyCode==80) note=41;
+                if(keyCode==189) note=42;
+                if(keyCode==219) note=43;
+                if(keyCode==187) note=44;
+                if(keyCode==221) note=45;
+                if(keyCode==8) note=46;
+                if(keyCode==220) note=47;
+                */
                 if( note == -1 ) return -1;
 
                 return ("_" + (note + controls.octave*12));
@@ -381,7 +428,7 @@
 
                     // Close the MIDI loader widget and open the GUI                                        
                     MIDI.loader.stop();
-                    songsToFiles ={
+                    songsToFiles ={"Round Midnight, Thelonious Monk": "Roundmidnight.mid",
                                     "Game Of Thrones Theme, Ramin Djawadi": "game_of_thrones.mid",
                                     "Mario Overworld Theme (Super Mario Bros 3), Koji Kondo": "mario_-_overworld_theme.mid",                                    
                                     "He's a Pirate (Pirates of the Caribbean), Klaus Badelt" : "hes_a_pirate.mid",
@@ -404,7 +451,7 @@
                                     "No. 2 - Oriental, Granados": "gra_esp_2.mid",
                                     "Bohemian Rhapsody, Queen": "bohemian1.mid",                                    
                                   };
-                    var gui = new dat.GUI({ width:625});
+                    var gui = new dat.GUI();//{ width:625});
                     //gui.add(controls, 'key_attack_time', 2.0 , 40.0);
                     //gui.add(controls, 'key_max_rotation',0.2 , 1.0);                             
                     var song = gui.add(controls, 'song', songsToFiles);
@@ -468,7 +515,6 @@
         Controls: Keyboard to play, Mouse to orbit<br/>
         Uses <a href="http://mudcu.be/midi-js/" target="_blank">MIDI.js</a> Source code available on <a href="https://github.com/reality3d/3d-piano-player" target="_blank">Github</a><br/>
         <a href="http://www.twitter.com/reality3d/" target="_blank">Borja Morales</a>
-		<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://www.rgba.org/r3d/3d-piano-player/" data-via="reality3d">Tweet</a>
     </div>
 	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>	
     </body>
