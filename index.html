@@ -60,7 +60,7 @@
 
             // Begin MIDI loader widger
             MIDI.loader = new widgets.Loader({
-                message: "Loading: Soundfont..."
+                message: "Loading: Keyboard..."
             });
             
             function smoothstep(a,b,x)
@@ -77,11 +77,14 @@
 
             var controls = new function()
             {
-                this.key_attack_time = 9.0;
+                this.key_attack_time = 4.0;
+                this.playback_speed = 1.0;
                 this.key_max_rotation = 0.72;
                 this.octave = 1;
-                this.song = "game_of_thrones.mid";
-                this.noteOnColor = [ 255, 0, 0, 1.0 ];
+                this.song = "Roundmidnight.mid";
+                this.monochrome = [ 255, 0, 0, 1.0 ];
+                this.chromatic = false;
+                this.color_by_fifths = false;
                 this.play = function()
                     {
                         MIDI.Player.resume();
@@ -123,7 +126,7 @@
             scene.add( floor );
             scene.fog = new THREE.Fog( 0xffffff, 40, 50 );
 
-            noteOnColor = new THREE.Color().setRGB(controls.noteOnColor[0]/256.0, controls.noteOnColor[1]/256.0, controls.noteOnColor[2]/256.0);
+            noteOnColor = new THREE.Color().setRGB(controls.monochrome[0]/256.0, controls.monochrome[1]/256.0, controls.monochrome[2]/256.0);
 
             init_lights();
 
@@ -233,6 +236,10 @@
                 render(delta);
 
             }
+            const colors = [0xff0000,0xff8000,0xffff00,0x80ff00,0x00ff00,0x00ff80,0x00ffff,0x0080ff,0x0000ff,0x8000ff,0xff00ff,0xff0080];
+            const noteToColor = (a) => {
+                return colors[a%colors.length];
+            }
             function update_key( obj, delta )
             {
                 if (obj.keyState == keyState.note_on)
@@ -242,8 +249,15 @@
                     {
                         obj.keyState = keyState.pressed;
                         obj.clock.elapsedTime = 0;
-                    }                    
+                    }
+                    //console.log(obj)
                     obj.material.color = noteOnColor;
+                    if (controls.chromatic){
+                        obj.material.color = new THREE.Color(noteToColor(obj.id/2));
+                    }
+                    if (controls.color_by_fifths){
+                        obj.material.color = new THREE.Color(noteToColor(5*obj.id/2));
+                    }
                 }
                 else if (obj.keyState == keyState.note_off)
                 {
@@ -274,51 +288,11 @@
 
             frame();
 
+            var lower = true;
             function keyCode_to_note( keyCode)
             {
                 var note = -1;
-                //
-                /*-----------------------------------
-                if(   keyCode==90 )  note= 0; // C 0
-                if(   keyCode==83 )  note= 1; // C#0
-                if(   keyCode==88 )  note= 2; // D 0
-                if(   keyCode==68 )  note= 3; // D#0
-                if(   keyCode==67 )  note= 4; // E 0
-                if(   keyCode==86 )  note= 5; // F 0
-                if(   keyCode==71 )  note= 6; // F#0
-                if(   keyCode==66 )  note= 7; // G 0
-                if(   keyCode==72 )  note= 8; // G#0
-                if(   keyCode==78 )  note= 9; // A 0
-                if(   keyCode==74 )  note=10; // A#0
-                if(   keyCode==77 )  note=11; // B 0
-                if(   keyCode==188 ) note=12; // C 0
-
-                //-----------------------------------
-                if(   keyCode==81 )  note=12; // C 1
-                if(   keyCode==50 )  note=13; // C#1
-                if(   keyCode==87 )  note=14; // D 1
-                if(   keyCode==51 )  note=15; // D#1
-                if(   keyCode==69 )  note=16; // E 1
-                if(   keyCode==82 )  note=17; // F 1
-                if(   keyCode==53 )  note=18; // F#1
-                if(   keyCode==84 )  note=19; // G 1
-                if(   keyCode==54 )  note=20; // G#1
-                if(   keyCode==89 )  note=21; // A 1
-                if(   keyCode==55 )  note=22; // A#1
-                if(   keyCode==85 )  note=23; // B 1
-                //-----------------------------------
-                if(   keyCode==73 )  note=24; // C 2
-                if(   keyCode==57 )  note=25; // C#2
-                if(   keyCode==79 )  note=26; // D 2
-                if(   keyCode==48 )  note=27; // D#2
-                if(   keyCode==80 )  note=28; // E 2
-                if(   keyCode==219 ) note=29; // F 2
-                if(   keyCode==187 ) note=30; // F#2
-                if(   keyCode==221 ) note=31; // G 2
-                //-----------------------------------
-                //
-                */
-                /*
+                //console.log(keyCode,controls.octave);
                 if(keyCode==16) note=5;
                 if(keyCode==65) note=6;
                 if(keyCode==90) note=7;
@@ -362,11 +336,19 @@
                 if(keyCode==221) note=45;
                 if(keyCode==8) note=46;
                 if(keyCode==220) note=47;
-                */
                 if( note == -1 ) return -1;
 
                 return ("_" + (note + controls.octave*12));
 
+            }
+            const updateOctave = (ev) => {
+                if (ev.key == 'CapsLock'){
+                    if (ev.type == 'keydown'){
+                        controls.octave=2;
+                    }else {
+                        controls.octave=1;
+                    }
+                }
             }
 
             window.onkeydown = function(ev)
@@ -374,6 +356,7 @@
                 if (keys_down[ev.keyCode] != true)
                 {
                     var note = keyCode_to_note(ev.keyCode);
+                    //console.log(note)
                     if (note != -1)
                     {
                         key_status(note, keyState.note_on);
@@ -385,8 +368,9 @@
                         MIDI.setVolume(0, 127);   
                         MIDI.noteOn(0, note, velocity, delay);                        
                     }
-                }            
-            }            
+                }
+                updateOctave(ev);
+            }
 
             window.onkeyup = function(ev)
             {
@@ -401,8 +385,8 @@
                     var velocity = 127;// how hard the note hits
                     MIDI.setVolume(0, 127);
                     MIDI.noteOff(0, note, delay + 0.08);
-                }            
-
+                }
+                updateOctave(ev);
             }                  
 
             window.onload = function ()
@@ -410,7 +394,7 @@
                 MIDI.loadPlugin(function ()
                 {
                     //MIDI.Player.loadFile(song[0], MIDI.Player.start);
-                    MIDI.Player.timeWarp = 1.0; // speed the song is played back
+                    MIDI.Player.timeWarp = controls.playback_speed; // speed the song is played back
                     MIDI.Player.loadFile("midi/" + controls.song);                    
                     
                     MIDI.Player.addListener(function(data)
@@ -451,24 +435,14 @@
                                     "No. 2 - Oriental, Granados": "gra_esp_2.mid",
                                     "Bohemian Rhapsody, Queen": "bohemian1.mid",                                    
                                   };
-                    var gui = new dat.GUI();//{ width:625});
+                    var gui = new dat.GUI({ width:300});
                     //gui.add(controls, 'key_attack_time', 2.0 , 40.0);
                     //gui.add(controls, 'key_max_rotation',0.2 , 1.0);                             
-                    var song = gui.add(controls, 'song', songsToFiles);
-                    var noteOnColorControl = gui.addColor(controls, 'noteOnColor');
-                    noteOnColorControl.onChange(function(value)
-                                    {
-                                        noteOnColor = new THREE.Color().setRGB(controls.noteOnColor[0]/256.0, controls.noteOnColor[1]/256.0, controls.noteOnColor[2]/256.0);;
-                                    });
 
-                    song.onChange(function(value)
-                                    {
-                                        MIDI.Player.stop();
-                                        MIDI.Player.loadFile("midi/" + value, MIDI.Player.start);
-                                    });
 
                     // make sure to remove any key pressed when changing the octave
-                    var octave = gui.add(controls, 'octave',0 , 4).step(1);
+                    var octave = gui.add(controls, 'octave',0 , 3).step(1);
+                    gui.add(controls, 'key_attack_time',1, 10).step(1);
                     octave.onChange(function(value)
                                     {
                                         for (keyCode in keys_down)
@@ -478,9 +452,24 @@
                                         }
                                         
                                     });
-
-                    gui.add(controls, 'play');
-                    gui.add(controls, 'stop');
+                    var keyColors = gui.addFolder('Key Colors');
+                    var noteOnColorControl = keyColors.addColor(controls, 'monochrome');
+                    noteOnColorControl.onChange(function(value)
+                                    {
+                                        noteOnColor = new THREE.Color().setRGB(controls.monochrome[0]/256.0, controls.monochrome[1]/256.0, controls.monochrome[2]/256.0);;
+                                    });
+                    keyColors.add(controls,'chromatic')
+                    keyColors.add(controls,'color_by_fifths')
+                    var midiFolder = gui.addFolder('Player Piano');
+                    var song = midiFolder.add(controls, 'song', songsToFiles);
+                    song.onChange(function(value)
+                                    {
+                                        MIDI.Player.stop();
+                                        MIDI.Player.loadFile("midi/" + value, MIDI.Player.start);
+                                    });
+                    midiFolder.add(controls, 'play');
+                    midiFolder.add(controls, 'stop');
+                    //midiFolder.add(controls, 'playback_speed',0.25,2);
                 });                               
             };            
 
