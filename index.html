@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>3D Piano Player (Three.js)</title>
+        <title>VSKeys (Three.js)</title>
         <script src="js/three.js"></script>
 
         <script src="js/OrbitAndPanControls.js"></script>
@@ -8,6 +8,7 @@
 
         <!-- extras -->
         <script src="js/base64binary.js" type="text/javascript"></script>
+        <script src="js/parser.js" type="text/javascript"></script>
 
         <script src="js/MIDI/AudioDetect.js" type="text/javascript"></script>
         <script src="js/MIDI/LoadPlugin.js" type="text/javascript"></script>
@@ -95,7 +96,6 @@
                         MIDI.Player.stop();
                     }
             };
-            
 
             var keyState = Object.freeze ({unpressed: {}, note_on: {}, pressed:{}, note_off:{} });
 
@@ -108,7 +108,7 @@
     
             var renderer = new THREE.WebGLRenderer({antialias:true});
             renderer.setSize(window.innerWidth, window.innerHeight);          
-            renderer.shadowMapEnabled = true;  
+            renderer.shadowMapEnabled = true;
             renderer.shadowMapSoft = true;
             renderer.shadowMapType = THREE.PCFSoftShadowMap;
             renderer.gammaInput = true;
@@ -218,7 +218,7 @@
             function key_status (keyName, status)
             {
                 var obj = scene.getObjectByName(keyName, true);
-                if (obj != undefined)
+                if (obj !== undefined)
                 {                 
                     obj.clock.start();
                     obj.clock.elapsedTime = 0;
@@ -358,14 +358,17 @@
                 }
             }
             const releaseKeys = () => {
-                console.log('release keys');
-                for (keyCode in keys_down){  
-                    var note = keyCode_to_note(keyCode);
-                    key_status(note, keyState.note_off);
+                //console.log('release keys');
+                //console.log(Parser.parseCommands());
+                for (keyCode in keys_down){ 
+                    if (keys_down[keyCode]){
+                        var note = keyCode_to_note(keyCode);
+                        key_status(note, keyState.note_off);
+                    }
                 }        
             }
             window.onblur = function(){
-                console.log('blurred');
+                //console.log('blurred');
                 releaseKeys();
             }
             window.onkeydown = function(ev)
@@ -407,7 +410,7 @@
                     MIDI.noteOff(0, note, delay + 0.08);
                 }
                 updateOctave(ev);
-            }                  
+            }
 
             window.onload = function ()
             {
