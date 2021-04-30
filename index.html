@@ -127,6 +127,7 @@ crossorigin="anonymous"></script>
             addTonnetz(scene);
             AMSynth = newAMSynth();
             //console.log(camera);
+            let piano = newPiano();
     
             var renderer = new THREE.WebGLRenderer({antialias:true});
             renderer.setSize(window.innerWidth, window.innerHeight);          
@@ -324,11 +325,12 @@ crossorigin="anonymous"></script>
                             AMSynth.triggerAttack(intToLetterName(note+12));
                         }
                         if (controls.instrument == 'piano'){
-                            var delay = 0; // play one note every quarter second
+                            piano.triggerAttack(intToLetterName(note));
+                            /*var delay = 0; // play one note every quarter second
                             var note = note+21; // the MIDI note
                             var velocity = 127; // how hard the note hits
                             MIDI.setVolume(0, 127);   
-                            MIDI.noteOn(0, note, velocity, delay);
+                            MIDI.noteOn(0, note, velocity, delay);*/
                         }
                     }
                 }
@@ -346,11 +348,12 @@ crossorigin="anonymous"></script>
                         AMSynth.triggerRelease(intToLetterName(note+12));
                     }
                     if (controls.instrument == 'piano'){
-                        var delay = 0; // play one note every quarter second
+                        piano.triggerRelease(intToLetterName(note));
+                        /*var delay = 0; // play one note every quarter second
                         var note = note+21;
                         var velocity = 127;// how hard the note hits
                         MIDI.setVolume(0, 127);
-                        MIDI.noteOff(0, note, delay + 0.08);
+                        MIDI.noteOff(0, note, delay + 0.08);*/
                     }
                 }
                 updateOctave(ev);

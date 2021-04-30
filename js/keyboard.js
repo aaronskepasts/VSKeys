@@ -47,7 +47,7 @@ function keyCode_to_note( keyCode)
     if(keyCode==220) note=47;
     if( note == -1 ) return -1;
     note += controls.octave*12;
-    console.log(intToLetterName(note));
+    //console.log(intToLetterName(note));
     return note;
 
 }
