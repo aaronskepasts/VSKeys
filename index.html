@@ -109,6 +109,7 @@ crossorigin="anonymous"></script>
             var scene = new THREE.Scene();
             var camera = new THREE.PerspectiveCamera(30, window.innerWidth/window.innerHeight, 2.0, 5000);
             var keys_down = [];
+            var chordStack = [];
             var keys_obj = [];
             var noteOnColor = new THREE.Color().setRGB(controls.monochrome[0]/256.0, controls.monochrome[1]/256.0, controls.monochrome[2]/256.0);
             
@@ -126,7 +127,7 @@ crossorigin="anonymous"></script>
             //const line = new THREE.Line( geometry, material );
             addTonnetz(scene);
             AMSynth = newSynth();
-            //console.log(camera);
+            console.log(keys_obj);
             let piano = newPiano();
     
             var renderer = new THREE.WebGLRenderer({antialias:true});
@@ -269,7 +270,7 @@ crossorigin="anonymous"></script>
                         obj.clock.elapsedTime = 0;
                     }
                     //console.log(obj)
-                    obj.material.color = noteToColor(obj.id/2);
+                    obj.material.color = noteToColor(obj.id/2+6);
                 }
                 else if (obj.keyState == keyState.note_off)
                 {
@@ -312,7 +313,6 @@ crossorigin="anonymous"></script>
                 }
                 if (keys_down[ev.keyCode] != true)
                 {
-                    
                     var note = keyCode_to_note(ev.keyCode);
                     //console.log(note)
                     if (note != -1)
@@ -321,7 +321,7 @@ crossorigin="anonymous"></script>
                         keys_down[ev.keyCode] = true;   
 
                         if (controls.instrument == 'AMSynth'){
-                            console.log(intToLetterName(note));
+                            //console.log(intToLetterName(note));
                             AMSynth.triggerAttack(intToLetterName(note+12));
                         }
                         if (controls.instrument == 'piano'){
@@ -332,7 +332,9 @@ crossorigin="anonymous"></script>
                             MIDI.setVolume(0, 127);   
                             MIDI.noteOn(0, note, velocity, delay);*/
                         }
+                        chordStack.push(note);
                     }
+                    updateGrid(scene,chordStack);
                 }
                 updateOctave(ev);
             }
@@ -355,6 +357,8 @@ crossorigin="anonymous"></script>
                         MIDI.setVolume(0, 127);
                         MIDI.noteOff(0, note, delay + 0.08);*/
                     }
+                    chordStack.splice(chordStack.indexOf(note),1);
+                    updateGrid(scene,chordStack);
                 }
                 updateOctave(ev);
             }
