@@ -1,3 +1,121 @@
+function key_status (keyName, status)
+{
+    var obj = scene.getObjectByName(keyName, true);
+    //console.log(keyName);
+    let note = parseInt(keyName.substring(1));
+    if (obj !== undefined){
+        obj.clock.start();
+        obj.clock.elapsedTime = 0;
+        obj.keyState = status;
+        obj.material.color = (status == keyState.note_on) ? noteToColor(obj.id/2+6).color: obj.material.note_off;
+        if (status == keyState.note_on){
+            if (controls.instrument == 'AMSynth'){
+                //console.log(intToLetterName(note));
+                let velocity = Math.pow(2,-note/12);
+                AMSynth.triggerAttack(intToLetterName(note+12),0,velocity*1.5);
+            }
+            if (controls.instrument == 'piano'){
+                piano.triggerAttack(intToLetterName(note));
+                /*var delay = 0; // play one note every quarter second
+                var note = note+21; // the MIDI note
+                var velocity = 127; // how hard the note hits
+                MIDI.setVolume(0, 127);
+                MIDI.noteOn(0, note, velocity, delay);*/
+            }
+            chordStack.push(note);
+        }
+        if (status == keyState.note_off){
+            if (controls.instrument == 'AMSynth'){
+                AMSynth.triggerRelease(intToLetterName(note+12));
+            }
+            if (controls.instrument == 'piano'){
+                piano.triggerRelease(intToLetterName(note));
+                /*var delay = 0; // play one note every quarter second
+                var note = note+21;
+                var velocity = 127;// how hard the note hits
+                MIDI.setVolume(0, 127);
+                MIDI.noteOff(0, note, delay + 0.08);*/
+            }
+            chordStack.splice(chordStack.indexOf(note),1);
+        }
+        if (controls.tonnetz){
+            updateGrid(scene,chordStack);
+        }
+        //console.log(chordStack);
+    }
+}
+const updateOctave = (ev) => {
+    if (ev.key == 'CapsLock'){
+        if (ev.type == 'keydown'){
+            controls.octave=2;
+        }else {
+            controls.octave=1;
+        }
+        let trollers = controls.gui.__controllers;
+        for (let c of trollers){
+            if (c.property=='octave'){
+                c.setValue(controls.octave);
+            }
+        }
+        releaseKeys();
+    }
+    //console.log(controls.key_color_scheme);
+}
+const releaseKeys = () => {
+    //console.log('release keys');
+    //console.log(Parser.parseCommands());
+    for (keyCode in keys_down){
+        if (keys_down[keyCode]){
+            var note = keyCode_to_note(keyCode);
+            key_status('_'+note, keyState.note_off);
+        }
+    }
+    piano.releaseAll();
+    AMSynth.releaseAll();
+}
+const intToLetterName = (n) =>{
+    let letter;
+    switch (n%12){
+        case 0:
+            letter = 'C';
+            break;
+        case 1:
+            letter = 'Db';
+            break;
+        case 2:
+            letter = 'D';
+            break;
+            case 3:
+            letter = 'Eb';
+            break;
+        case 4:
+            letter = 'E';
+            break;
+        case 5:
+            letter = 'F';
+            break;
+            case 6:
+                letter = 'Gb';
+            break;
+        case 7:
+            letter = 'G';
+            break;
+        case 8:
+            letter = 'Ab';
+            break;
+            case 9:
+                letter = 'A';
+                break;
+        case 10:
+            letter = 'Bb';
+            break;
+            case 11:
+            letter = 'B';
+            break;
+        }
+    return letter + String(Math.floor(n/12));
+}
+
 function keyCode_to_note( keyCode)
 {
     var note = -1;
@@ -50,73 +168,4 @@ function keyCode_to_note( keyCode)
     //console.log(intToLetterName(note));
     return note;
 
-}
-const updateOctave = (ev) => {
-    if (ev.key == 'CapsLock'){
-        if (ev.type == 'keydown'){
-            controls.octave=2;
-        }else {
-            controls.octave=1;
-        }
-        let trollers = controls.gui.__controllers;
-        for (let c of trollers){
-            if (c.property=='octave'){
-                c.setValue(controls.octave);
-            }
-        }
-        releaseKeys();
-    }
-    //console.log(controls.key_color_scheme);
-}
-const releaseKeys = () => {
-    //console.log('release keys');
-    //console.log(Parser.parseCommands());
-    for (keyCode in keys_down){
-        if (keys_down[keyCode]){
-            var note = keyCode_to_note(keyCode);
-            key_status(note, keyState.note_off);
-        }
-    }
-}
-const intToLetterName = (n) =>{
-    let letter;
-    switch (n%12){
-        case 0:
-            letter = 'C';
-            break;
-        case 1:
-            letter = 'Db';
-            break;
-        case 2:
-            letter = 'D';
-            break;
-        case 3:
-            letter = 'Eb';
-            break;
-        case 4:
-            letter = 'E';
-            break;
-        case 5:
-            letter = 'F';
-            break;
-        case 6:
-            letter = 'Gb';
-            break;
-        case 7:
-            letter = 'G';
-            break;
-        case 8:
-            letter = 'Ab';
-            break;
-        case 9:
-            letter = 'A';
-            break;
-        case 10:
-            letter = 'Bb';
-            break;
-        case 11:
-            letter = 'B';
-            break;
-    }
-    return letter + String(Math.floor(n/12));
 }

@@ -1,8 +1,8 @@
 const addTonnetz = (scene) => {
     const grid_size = 7;
     const side_len = 1;
-    const corner = new THREE.Vector3(2.5,0,-6);
-    const radius = 0.2
+    const corner = new THREE.Vector3(2.5,0,-6.5);
+    const radius = 0.2;
     const off = new THREE.MeshPhongMaterial( {color: 0x000000} );
     let sphereList = [];
     let bass = 0;
@@ -32,8 +32,8 @@ const addTonnetz = (scene) => {
     const blackLine = new THREE.LineBasicMaterial( { color: 0x000000, linewidth: 20} );
     //const whiteLine = new THREE.LineBasicMaterial( { color: 0xffffff, opacity:0, transparent: true} );
     //console.log(MeshLine);
-    for (let a of scene.children){
-        for (let b of scene.children){
+    for (let a of sphereList){
+        for (let b of sphereList){
             //console.log(a.position,b.position);
             let inter = new THREE.Vector3().subVectors(a.position,b.position);
             if (inter.length() < side_len*1.2 && inter.length()>side_len*0.5){

@@ -17,6 +17,7 @@ crossorigin="anonymous"></script>
         <script src="js/keyboard.js" type="text/javascript"></script>
         <script src="js/instrument.js" type="text/javascript"></script>
         <script src="js/tonnetz.js" type="text/javascript"></script>
+        <script src="js/makegui.js" type="text/javascript"></script>
 
         <script src="js/MIDI/AudioDetect.js" type="text/javascript"></script>
         <script src="js/MIDI/LoadPlugin.js" type="text/javascript"></script>
@@ -32,7 +33,7 @@ crossorigin="anonymous"></script>
         <script src="js/jasmid/replayer.js"></script>
 
         <script type="text/javascript" src="js/dat.gui.js"></script>
-
+<link rel="shortcut icon" href='piano.png'>
         <style>
             canvas
             {
@@ -95,6 +96,7 @@ crossorigin="anonymous"></script>
                 this.key_color_scheme = 'monochrome';
                 this.monochrome = [ 128, 0, 255, 1.0 ];
                 this.gui;
+                this.tonnetz = true;
                 this.orbit=false;
                 this.play = function()
                     {
@@ -118,7 +120,7 @@ crossorigin="anonymous"></script>
             for (let i = 0; i<colors.length; i++){
                 colors[i] = new THREE.MeshPhongMaterial( {color: colors[i]} );
             }
-            console.log(colors);
+            //console.log(colors);
             const noteToColor = (a) => {
                 switch (controls.key_color_scheme){
                     case 'monochrome':
@@ -148,7 +150,7 @@ crossorigin="anonymous"></script>
 
             var material = new THREE.MeshLambertMaterial( { color: 0x606060} )
 
-            floor = new THREE.Mesh( new THREE.PlaneGeometry( 8000, 8000 ), new THREE.MeshBasicMaterial( { color: 0xf0f0f0 } ) );
+            let floor = new THREE.Mesh( new THREE.PlaneGeometry( 8000, 8000 ), new THREE.MeshBasicMaterial( { color: 0xf0f0f0 } ) );
             floor.rotation.x = - 90 * ( Math.PI / 180 );
             floor.position.y = -0.45;
             floor.receiveShadow = true;
@@ -242,19 +244,6 @@ crossorigin="anonymous"></script>
 
             }
 
-            function key_status (keyName, status)
-            {
-                var obj = scene.getObjectByName(keyName, true);
-                if (obj !== undefined)
-                {
-                    obj.clock.start();
-                    obj.clock.elapsedTime = 0;
-                    obj.keyState = status;
-                    obj.material.color = (status == keyState.note_on) ? noteToColor(obj.id/2+6).color: obj.material.note_off;
-
-                }
-            }
-
             function frame()
             {
                 requestAnimationFrame(frame);
@@ -331,22 +320,7 @@ crossorigin="anonymous"></script>
                     {
                         key_status('_'+String(note), keyState.note_on);
                         keys_down[ev.keyCode] = true;
-
-                        if (controls.instrument == 'AMSynth'){
-                            //console.log(intToLetterName(note));
-                            AMSynth.triggerAttack(intToLetterName(note+12));
-                        }
-                        if (controls.instrument == 'piano'){
-                            piano.triggerAttack(intToLetterName(note));
-                            /*var delay = 0; // play one note every quarter second
-                            var note = note+21; // the MIDI note
-                            var velocity = 127; // how hard the note hits
-                            MIDI.setVolume(0, 127);
-                            MIDI.noteOn(0, note, velocity, delay);*/
-                        }
-                        chordStack.push(note);
                     }
-                    updateGrid(scene,chordStack);
                 }
                 updateOctave(ev);
             }
@@ -358,19 +332,7 @@ crossorigin="anonymous"></script>
                     var note = keyCode_to_note(ev.keyCode);
                     key_status('_'+String(note), keyState.note_off);
                     keys_down[ev.keyCode] = false;
-                    if (controls.instrument == 'AMSynth'){
-                        AMSynth.triggerRelease(intToLetterName(note+12));
-                    }
-                    if (controls.instrument == 'piano'){
-                        piano.triggerRelease(intToLetterName(note));
-                        /*var delay = 0; // play one note every quarter second
-                        var note = note+21;
-                        var velocity = 127;// how hard the note hits
-                        MIDI.setVolume(0, 127);
-                        MIDI.noteOff(0, note, delay + 0.08);*/
-                    }
-                    chordStack.splice(chordStack.indexOf(note),1);
-                    updateGrid(scene,chordStack);
+                    
                 }
                 updateOctave(ev);
             }
@@ -421,40 +383,7 @@ crossorigin="anonymous"></script>
                                     "No. 2 - Oriental, Granados": "gra_esp_2.mid",
                                     "Bohemian Rhapsody, Queen": "bohemian1.mid",
                                   };
-                    var gui = new dat.GUI({ width:250,hideable: false});
-                    controls.gui = gui;
-                    //gui.add(controls, 'key_attack_time', 2.0 , 40.0);
-                    //gui.add(controls, 'key_max_rotation',0.2 , 1.0);
-
-
-                    // make sure to remove any key pressed when changing the octave
-                    gui.add(controls, 'instrument',{"Piano":'piano','AMSynth':'AMSynth'}).name('Instrument');
-                    gui.add(controls, 'orbit');
-                    //gui.add(controls, 'key_attack_time',1, 10).step(1);
-                    var octave = gui.add(controls, 'octave',0 , 3).step(1);
-                    octave.onChange(releaseKeys());
-                    var keyColors = gui.addFolder('Key Colors');
-                    var noteOnColorControl = keyColors.addColor(controls, 'monochrome');
-                    noteOnColorControl.onChange(function(value)
-                                    {
-                                        noteOnColor = new THREE.Color().setRGB(controls.monochrome[0]/256.0, controls.monochrome[1]/256.0, controls.monochrome[2]/256.0);;
-                                    });
-                    var keyColor = keyColors.add(controls,'key_color_scheme',{"Monochrome":'monochrome',"Chromatic":'chromatic',"Circle of Fifths":'fifths'}).name('Color Scheme');
-                    keyColor.onChange((val)=>{
-                        for (let s of scene.sphereList){
-                            s.onColor = noteToColor(s.note);
-                        }
-                    })
-                    var midiFolder = gui.addFolder('Player Piano');
-                    var song = midiFolder.add(controls, 'song', songsToFiles);
-                    song.onChange(function(value)
-                                    {
-                                        MIDI.Player.stop();
-                                        MIDI.Player.loadFile("midi/" + value, MIDI.Player.start);
-                                    });
-                    midiFolder.add(controls, 'play');
-                    midiFolder.add(controls, 'stop');
-                    //midiFolder.add(controls, 'playback_speed',0.25,2);
+                makeGUI();
                 });
             };
 
