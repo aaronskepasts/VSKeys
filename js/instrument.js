@@ -2,7 +2,7 @@ const newSynth = ()=>{
     //create a synth and connect it to the main output (your speakers)
     return new Tone.PolySynth().toDestination();
 }
-const newPiano = () => {
+const newPiano = (href) => {
     const noteToMp3 = {
         A0:'A0.mp3',
         A3:'A3.mp3',
@@ -95,7 +95,7 @@ const newPiano = () => {
         Gb5:'Gb5.mp3'};
         let piano = new Tone.Sampler({
             urls: noteToMp3,
-            baseUrl: "../soundfont/acoustic_grand_piano-mp3/",
+            baseUrl: href+"soundfont/acoustic_grand_piano-mp3/",
             onload: () => {
                 console.log('loaded piano');
             }
