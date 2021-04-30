@@ -1,8 +1,8 @@
 <html>
     <head>
         <title>VSKeys</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" 
-integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ==" 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
+integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ=="
 crossorigin="anonymous"></script>
         <script src="js/three.js"></script>
         <script src="js/OrbitAndPanControls.js"></script>
@@ -35,7 +35,7 @@ crossorigin="anonymous"></script>
         <style>
             canvas
             {
-                width: 100%; height: 100% 
+                width: 100%; height: 100%
             }
             body
             {
@@ -61,16 +61,16 @@ crossorigin="anonymous"></script>
                 color: #1e83ff;
             }
 
-        </style>    
+        </style>
     </head>
-    <body>        
+    <body>
         <script type="text/javascript">
 
             // Begin MIDI loader widger
             MIDI.loader = new widgets.Loader({
                 message: "Loading Keyboard..."
             });
-            
+
             function smoothstep(a,b,x)
             {
                 if( x<a ) return 0.0;
@@ -81,7 +81,7 @@ crossorigin="anonymous"></script>
             function mix(a,b,x)
             {
                 return a + (b - a)*Math.min(Math.max(x,0.0),1.0);
-            }            
+            }
 
             var controls = new function()
             {
@@ -112,7 +112,7 @@ crossorigin="anonymous"></script>
             var chordStack = [];
             var keys_obj = [];
             var noteOnColor = new THREE.Color().setRGB(controls.monochrome[0]/256.0, controls.monochrome[1]/256.0, controls.monochrome[2]/256.0);
-            
+
             const colors = [0xff0000,0xff8000,0xffff00,0x80ff00,0x00ff00,0x00ff80,0x00ffff,0x0080ff,0x0000ff,0x8000ff,0xff00ff,0xff0080];
             const noteToColor = (a) => {
                 switch (controls.key_color_scheme){
@@ -129,9 +129,9 @@ crossorigin="anonymous"></script>
             AMSynth = newSynth();
             console.log(keys_obj);
             let piano = newPiano(window.location.href);
-    
+
             var renderer = new THREE.WebGLRenderer({antialias:true});
-            renderer.setSize(window.innerWidth, window.innerHeight);          
+            renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.shadowMapEnabled = true;
             renderer.shadowMapSoft = true;
             renderer.shadowMapType = THREE.PCFSoftShadowMap;
@@ -141,7 +141,7 @@ crossorigin="anonymous"></script>
 
             document.body.appendChild(renderer.domElement);
 
-            var material = new THREE.MeshLambertMaterial( { color: 0x606060} ) 
+            var material = new THREE.MeshLambertMaterial( { color: 0x606060} )
 
             floor = new THREE.Mesh( new THREE.PlaneGeometry( 8000, 8000 ), new THREE.MeshBasicMaterial( { color: 0xf0f0f0 } ) );
             floor.rotation.x = - 90 * ( Math.PI / 180 );
@@ -172,13 +172,13 @@ crossorigin="anonymous"></script>
                 camera.updateProjectionMatrix();
 
                 renderer.setSize( window.innerWidth, window.innerHeight );
-            }    
+            }
 
             function init_lights()
             {
                 //var spotlight = new THREE.SpotLight(0xffffff);
                 var spotlight = new THREE.DirectionalLight(0xffffff);
-                
+
                 spotlight.position.set(1.0,2.4,-7.5);
                 spotlight.target.position.set(6.0,-6,7);
                 spotlight.shadowCameraVisible = false;
@@ -191,13 +191,13 @@ crossorigin="anonymous"></script>
                 spotlight.shadowCameraNear = 5.0;
                 spotlight.shadowCameraFar = 20.0;
                 spotlight.shadowBias = 0.0025;
-                
+
                 spotlight.shadowCameraLeft = -8.85;
                 spotlight.shadowCameraRight = 5.5;
                 spotlight.shadowCameraTop = 4;
-                spotlight.shadowCameraBottom = 0;                
+                spotlight.shadowCameraBottom = 0;
                 scene.add(spotlight);
-                
+
                 var light = new THREE.DirectionalLight( 0xddffff, 0.5 );
                 light.position.set( 1, 1, 1 ).normalize();
                 scene.add( light );
@@ -209,13 +209,13 @@ crossorigin="anonymous"></script>
 
             function prepare_scene( collada )
             {
-                collada.scene.traverse(initialize_keys);                
-                scene.add(collada.scene);                
+                collada.scene.traverse(initialize_keys);
+                scene.add(collada.scene);
             }
 
             function initialize_keys( obj)
             {
-                keys_obj.push(obj);                
+                keys_obj.push(obj);
                 obj.rotation.x = -Math.PI/4.0;
                 obj.rotation.y = 0;
                 obj.rotation.z = 0;
@@ -232,7 +232,7 @@ crossorigin="anonymous"></script>
                     obj.material.shininess = 35.0;
                     obj.material.specular = new THREE.Color().setRGB(0.25, 0.25, 0.25);;
                     obj.material.note_off = obj.material.color.clone();
-                   
+
                 }
 
             }
@@ -241,7 +241,7 @@ crossorigin="anonymous"></script>
             {
                 var obj = scene.getObjectByName(keyName, true);
                 if (obj !== undefined)
-                {                 
+                {
                     obj.clock.start();
                     obj.clock.elapsedTime = 0;
                     obj.keyState = status;
@@ -286,22 +286,27 @@ crossorigin="anonymous"></script>
 
             function update( delta )
             {
-                cameraControls.update(delta);
-                for(i in keys_obj)
-                {
-                    update_key(keys_obj[i], delta);
-                }
+              if (controls.orbit){
+                cameraControls.autoRotate = true;
+              } else {
+                cameraControls.autoRotate = false;
+              }
+              cameraControls.update(delta);
+              for(i in keys_obj)
+              {
+                  update_key(keys_obj[i], delta);
+              }
                 //console.log(delta);
             }
-        
+
             function render( delta )
-            {                
+            {
                 renderer.render(scene, camera);
             };
 
             frame();
 
-            
+
             window.onblur = function(){
                 //console.log('blurred');
                 releaseKeys();
@@ -318,7 +323,7 @@ crossorigin="anonymous"></script>
                     if (note != -1)
                     {
                         key_status('_'+String(note), keyState.note_on);
-                        keys_down[ev.keyCode] = true;   
+                        keys_down[ev.keyCode] = true;
 
                         if (controls.instrument == 'AMSynth'){
                             //console.log(intToLetterName(note));
@@ -329,7 +334,7 @@ crossorigin="anonymous"></script>
                             /*var delay = 0; // play one note every quarter second
                             var note = note+21; // the MIDI note
                             var velocity = 127; // how hard the note hits
-                            MIDI.setVolume(0, 127);   
+                            MIDI.setVolume(0, 127);
                             MIDI.noteOn(0, note, velocity, delay);*/
                         }
                         chordStack.push(note);
@@ -369,8 +374,8 @@ crossorigin="anonymous"></script>
                 {
                     //MIDI.Player.loadFile(song[0], MIDI.Player.start);
                     MIDI.Player.timeWarp = controls.playback_speed; // speed the song is played back
-                    MIDI.Player.loadFile("midi/" + controls.song);                    
-                    
+                    MIDI.Player.loadFile("midi/" + controls.song);
+
                     MIDI.Player.addListener(function(data)
                     {
                         var pianoKey = data.note - MIDI.pianoKeyOffset - 3;
@@ -384,35 +389,35 @@ crossorigin="anonymous"></script>
                         }
                     });
 
-                    // Close the MIDI loader widget and open the GUI                                        
+                    // Close the MIDI loader widget and open the GUI
                     MIDI.loader.stop();
                     songsToFiles ={"Round Midnight, Thelonious Monk": "Roundmidnight.mid",
                                     "Game Of Thrones Theme, Ramin Djawadi": "game_of_thrones.mid",
-                                    "Mario Overworld Theme (Super Mario Bros 3), Koji Kondo": "mario_-_overworld_theme.mid",                                    
+                                    "Mario Overworld Theme (Super Mario Bros 3), Koji Kondo": "mario_-_overworld_theme.mid",
                                     "He's a Pirate (Pirates of the Caribbean), Klaus Badelt" : "hes_a_pirate.mid",
                                     "Hedwigs Theme (Harry Potter), John Williams": "hedwigs_theme.mid",
                                     "Something There (Beauty and the Beast), Alan Menken":"something_there.mid",
                                     "Cruel Angel Thesis (Neon Genesis Evangelion)": "cruel_angel__s_thesis.mid",
                                     "Me cuesta tanto olvidarte (Mecano)": "me_cuesta.mid",
                                     "Sonata No. 14 C# minor (Moonlight), Beethoven": "mond_1.mid",
-                                    "For Elise, Beethoven": "for_elise_by_beethoven.mid",                                    
+                                    "For Elise, Beethoven": "for_elise_by_beethoven.mid",
                                     "Asturias (Leyenda), Albeniz": "alb_se5_format0.mid",
                                     "Aragon (Fantasia), Albeniz": "alb_se6.mid",
                                     "Prelude and Fugue in C major BWV 846, Bach": "bach_846.mid",
                                     "Fantasia C major, Schubert": "schub_d760_1.mid",
-                                    "Sonata No. 16 C major, Mozart": "mz_545_1.mid",			    
+                                    "Sonata No. 16 C major, Mozart": "mz_545_1.mid",
                                     "Sonata No. 11 A major (K331, First Movement), Mozart": "mz_331_1.mid",
                                     "March - Song of the Lark, Tchaikovsky":"ty_maerz.mid",
                                     "Piano Sonata in C major, Hoboken, Haydn": "haydn_35_1.mid",
                                     "Etudes, Opus 25, Chopin": "chpn_op25_e1.mid",
                                     "Polonaise Ab major, Opus 53, Chopin": "chpn_op53.mid",
                                     "No. 2 - Oriental, Granados": "gra_esp_2.mid",
-                                    "Bohemian Rhapsody, Queen": "bohemian1.mid",                                    
+                                    "Bohemian Rhapsody, Queen": "bohemian1.mid",
                                   };
                     var gui = new dat.GUI({ width:250,hideable: false});
                     controls.gui = gui;
                     //gui.add(controls, 'key_attack_time', 2.0 , 40.0);
-                    //gui.add(controls, 'key_max_rotation',0.2 , 1.0);                             
+                    //gui.add(controls, 'key_max_rotation',0.2 , 1.0);
 
 
                     // make sure to remove any key pressed when changing the octave
@@ -428,7 +433,7 @@ crossorigin="anonymous"></script>
                                         noteOnColor = new THREE.Color().setRGB(controls.monochrome[0]/256.0, controls.monochrome[1]/256.0, controls.monochrome[2]/256.0);;
                                     });
                     keyColors.add(controls,'key_color_scheme',{"Monochrome":'monochrome',"Chromatic":'chromatic',"Circle of Fifths":'fifths'}).name('Color Scheme');
-                    var midiFolder = gui.addFolder('Player Piano');  
+                    var midiFolder = gui.addFolder('Player Piano');
                     var song = midiFolder.add(controls, 'song', songsToFiles);
                     song.onChange(function(value)
                                     {
@@ -465,6 +470,6 @@ crossorigin="anonymous"></script>
         Uses <a href="http://mudcu.be/midi-js/" target="_blank">MIDI.js</a> Source code available on <a href="https://github.com/reality3d/3d-piano-player" target="_blank">Github</a><br/>
         <a href="http://www.twitter.com/reality3d/" target="_blank">Borja Morales</a>
     </div>
-	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>	
+	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
     </body>
 </html>
