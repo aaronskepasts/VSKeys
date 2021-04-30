@@ -157,12 +157,12 @@ crossorigin="anonymous"></script>
 
             loader.load( 'obj/piano.dae', prepare_scene );
 
-            camera.position.x = -2.77;
-            camera.position.z = 10.04;
-            camera.position.y = 5.51;
+            camera.position.x = -3.77;
+            camera.position.z = 11.04;
+            camera.position.y = 6.51;
 
             var cameraControls = new THREE.OrbitAndPanControls(camera, renderer.domElement);
-            cameraControls.target.set(4.5,0,0);
+            cameraControls.target.set(6,0,0);
 
             var clock = new THREE.Clock();
 
