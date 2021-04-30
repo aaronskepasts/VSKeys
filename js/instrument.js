@@ -95,7 +95,7 @@ const newPiano = () => {
         Gb5:'Gb5.mp3'};
         let piano = new Tone.Sampler({
             urls: noteToMp3,
-            baseUrl: "/soundfont/acoustic_grand_piano-mp3/",
+            baseUrl: "../soundfont/acoustic_grand_piano-mp3/",
             onload: () => {
                 console.log('loaded piano');
             }
