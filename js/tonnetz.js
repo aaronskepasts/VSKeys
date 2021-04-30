@@ -19,7 +19,8 @@ const addTonnetz = (scene) => {
             let sphere = new THREE.Mesh( sGeo, off);
             sphere.position = new THREE.Vector3(x,corner.y,z);
             sphere.note = (bass+j*7)%12;
-            sphere.off = off;
+            sphere.onColor = noteToColor(sphere.note);
+            sphere.offColor = off;
             //console.log(intToLetterName(sphere.note));
             scene.add( sphere );
             sphereList.push(sphere);
@@ -28,28 +29,35 @@ const addTonnetz = (scene) => {
     }
     //console.log(sphereList);
     let lineList = [];
-    const blackLine = new THREE.LineBasicMaterial( { color: 0x000000 } );
-    const whiteLine = new THREE.LineBasicMaterial( { color: 0xffffff, opacity:0, transparent: true} );
+    const blackLine = new THREE.LineBasicMaterial( { color: 0x000000, linewidth: 20} );
+    //const whiteLine = new THREE.LineBasicMaterial( { color: 0xffffff, opacity:0, transparent: true} );
+    //console.log(MeshLine);
     for (let a of scene.children){
-        let numClose = 0;
         for (let b of scene.children){
             //console.log(a.position,b.position);
             let inter = new THREE.Vector3().subVectors(a.position,b.position);
             if (inter.length() < side_len*1.2 && inter.length()>side_len*0.5){
-                numClose++;
                 let lineGeo = new THREE.BufferGeometry();
-                //console.log(lineGeo);
                 lineGeo.attributes.position = new THREE.BufferAttribute( new Float32Array([a.position.x,a.position.y,a.position.z,b.position.x,b.position.y,b.position.z]), 3);
-                let line = new THREE.Line( lineGeo, whiteLine );
+                let line = new THREE.Line( lineGeo, blackLine );
+                line.visible = false;
                 line.adj = [Math.min(a.note,b.note),Math.max(a.note,b.note)];
-                line.off = whiteLine;
-                line.on = blackLine;
+                //line.on = blackLine;
                 scene.add(line);
                 lineList.push(line);
             }
         }
         //console.log(numClose,a.id);
     }
+    /*
+    let line = new MeshLine();
+    line.setPoints([new THREE.Vector3(),new THREE.Vector3(4,1,4)]);
+    line.morphNormals = [];
+    line.faces = [];
+    console.log(line);
+    let blackMeshLine = new MeshLineMaterial( { color: 0x000000, linewidth: 20} );
+    scene.add(new THREE.Mesh(line,blackMeshLine));
+    */
     //console.log(lineList);
     scene.sphereList = sphereList;
     scene.lineList = lineList;
@@ -62,23 +70,23 @@ const updateGrid = (scene, chord) => {
       });
     //console.log('chord',chord);
     for (let s of scene.sphereList){
-        s.material = s.off;
+        s.material = s.offColor;
     }
     for (let c of chord){
         for (let s of scene.sphereList){
             if (s.note==c){
-                s.material=new THREE.MeshPhongMaterial({color:noteToColor(s.note)});
+                s.material = s.onColor;
             }
         }
     }
     for (let l of scene.lineList){
-        l.material = l.off;
+        l.visible = false;
     }
     for (let i = 0; i<chord.length-1; i++){
         for (let j = i+1; j<chord.length; j++){
             for (let l of scene.lineList){
                 if (l.adj[0]==chord[i] && l.adj[1]==chord[j]){
-                    l.material = l.on;
+                    l.visible = true;
                 }
             }
         }

@@ -4,6 +4,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
 integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ=="
 crossorigin="anonymous"></script>
+<!--script src="js/THREE.MeshLine.js"></script-->
         <script src="js/three.js"></script>
         <script src="js/OrbitAndPanControls.js"></script>
         <script src="js/ColladaLoader.js"></script>
@@ -111,23 +112,27 @@ crossorigin="anonymous"></script>
             var keys_down = [];
             var chordStack = [];
             var keys_obj = [];
-            var noteOnColor = new THREE.Color().setRGB(controls.monochrome[0]/256.0, controls.monochrome[1]/256.0, controls.monochrome[2]/256.0);
+            var noteOnColor = new THREE.MeshPhongMaterial( {color: new THREE.Color().setRGB(controls.monochrome[0]/256.0, controls.monochrome[1]/256.0, controls.monochrome[2]/256.0)} );
 
-            const colors = [0xff0000,0xff8000,0xffff00,0x80ff00,0x00ff00,0x00ff80,0x00ffff,0x0080ff,0x0000ff,0x8000ff,0xff00ff,0xff0080];
+            let colors = [0xff0000,0xff8000,0xffff00,0x80ff00,0x00ff00,0x00ff80,0x00ffff,0x0080ff,0x0000ff,0x8000ff,0xff00ff,0xff0080];
+            for (let i = 0; i<colors.length; i++){
+                colors[i] = new THREE.MeshPhongMaterial( {color: colors[i]} );
+            }
+            console.log(colors);
             const noteToColor = (a) => {
                 switch (controls.key_color_scheme){
                     case 'monochrome':
                         return noteOnColor;
                     case 'chromatic':
-                        return new THREE.Color(colors[a%colors.length]);
+                        return colors[a%colors.length];
                     case 'fifths':
-                        return new THREE.Color(colors[(7*a)%colors.length]);
+                        return colors[(7*a)%colors.length];
                 }
             }
             //const line = new THREE.Line( geometry, material );
             addTonnetz(scene);
             AMSynth = newSynth();
-            console.log(keys_obj);
+            //console.log(keys_obj);
             let piano = newPiano(window.location.href);
 
             var renderer = new THREE.WebGLRenderer({antialias:true});
@@ -245,6 +250,8 @@ crossorigin="anonymous"></script>
                     obj.clock.start();
                     obj.clock.elapsedTime = 0;
                     obj.keyState = status;
+                    obj.material.color = (status == keyState.note_on) ? noteToColor(obj.id/2+6).color: obj.material.note_off;
+
                 }
             }
 
@@ -264,23 +271,23 @@ crossorigin="anonymous"></script>
                 if (obj.keyState == keyState.note_on)
                 {
                     obj.rotation.x = mix(-Math.PI/4.0, -controls.key_max_rotation, smoothstep(0.0, 1.0, controls.key_attack_time*obj.clock.getElapsedTime()));
-                    if (obj.rotation.x >= -controls.key_max_rotation)
+                    /*if (obj.rotation.x >= -controls.key_max_rotation)
                     {
                         obj.keyState = keyState.pressed;
                         obj.clock.elapsedTime = 0;
-                    }
-                    //console.log(obj)
-                    obj.material.color = noteToColor(obj.id/2+6);
+                    }*/
+                    //console.log(noteToColor(obj.id/2+6));
                 }
                 else if (obj.keyState == keyState.note_off)
                 {
                     obj.rotation.x = mix(-controls.key_max_rotation, -Math.PI/4.0, smoothstep(0.0, 1.0, controls.key_attack_time*obj.clock.getElapsedTime()));
+                    /*
                     if (obj.rotation.x <= -Math.PI/4.0)
                     {
                         obj.keyState = keyState.unpressed;
                         obj.clock.elapsedTime = 0;
-                    }
-                    obj.material.color = obj.material.note_off;
+                    }*/
+                    //obj.material.color = ;
                 }
             }
 
@@ -432,7 +439,12 @@ crossorigin="anonymous"></script>
                                     {
                                         noteOnColor = new THREE.Color().setRGB(controls.monochrome[0]/256.0, controls.monochrome[1]/256.0, controls.monochrome[2]/256.0);;
                                     });
-                    keyColors.add(controls,'key_color_scheme',{"Monochrome":'monochrome',"Chromatic":'chromatic',"Circle of Fifths":'fifths'}).name('Color Scheme');
+                    var keyColor = keyColors.add(controls,'key_color_scheme',{"Monochrome":'monochrome',"Chromatic":'chromatic',"Circle of Fifths":'fifths'}).name('Color Scheme');
+                    keyColor.onChange((val)=>{
+                        for (let s of scene.sphereList){
+                            s.onColor = noteToColor(s.note);
+                        }
+                    })
                     var midiFolder = gui.addFolder('Player Piano');
                     var song = midiFolder.add(controls, 'song', songsToFiles);
                     song.onChange(function(value)
