@@ -93,11 +93,13 @@ const newPiano = () => {
         G6:'G6.mp3',
         Gb2:'Gb2.mp3',
         Gb5:'Gb5.mp3'};
-        return new Tone.Sampler({
+        let piano = new Tone.Sampler({
             urls: noteToMp3,
             baseUrl: "/soundfont/acoustic_grand_piano-mp3/",
             onload: () => {
                 console.log('loaded piano');
             }
         }).toDestination();
+        piano.release = 1;
+        return piano;
 }
