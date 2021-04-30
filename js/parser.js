@@ -8,7 +8,7 @@ Parser.parseCommands = function() {
   url = url.replace(/_/g, " ");
   // trim off everything before "?"
   var pos = url.lastIndexOf('?');
-  console.log('url',url,'pos',pos);
+  //console.log('url',url,'pos',pos);
   if (pos === -1) { // no commands found
     return [];
   }

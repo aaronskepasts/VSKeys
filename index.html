@@ -1,8 +1,10 @@
 <html>
     <head>
-        <title>VSKeys (Three.js)</title>
+        <title>VSKeys</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" 
+integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ==" 
+crossorigin="anonymous"></script>
         <script src="js/three.js"></script>
-
         <script src="js/OrbitAndPanControls.js"></script>
         <script src="js/ColladaLoader.js"></script>
 
@@ -87,6 +89,7 @@
                 this.chromatic = false;
                 this.color_by_fifths = false;
                 this.gui;
+                this.orbit=false;
                 this.play = function()
                     {
                         MIDI.Player.resume();
@@ -96,15 +99,58 @@
                         MIDI.Player.stop();
                     }
             };
-
             var keyState = Object.freeze ({unpressed: {}, note_on: {}, pressed:{}, note_off:{} });
 
 
             var scene = new THREE.Scene();
             var camera = new THREE.PerspectiveCamera(30, window.innerWidth/window.innerHeight, 2.0, 5000);
-
             var keys_down = [];
             var keys_obj = [];
+
+            const colors = [0xff0000,0xff8000,0xffff00,0x80ff00,0x00ff00,0x00ff80,0x00ffff,0x0080ff,0x0000ff,0x8000ff,0xff00ff,0xff0080];
+            const noteToColor = (a) => {
+                return colors[a%colors.length];
+            }
+            const addTonnetz = (scene) => {
+                const grid_size = 7;
+                const side_len = 1;
+                const corner = new THREE.Vector3(3,0,-6);
+                const radius = 0.2
+                const smaterial = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+                for (let i = 0; i<grid_size; i++){
+                    let z = i * Math.sqrt(3)/2 * side_len + corner.z;
+                    row = i%2 ? grid_size +1: grid_size;
+                    for (let j = 0; j<row; j++){
+                        let x = j * side_len + corner.x;
+                        if (i%2 == 0){
+                            x+=side_len/2;
+                        }
+                        let sgeometry = new THREE.SphereGeometry( radius, 16, 16 );
+                        let sphere = new THREE.Mesh( sgeometry, smaterial );
+                        sphere.position = new THREE.Vector3(x,corner.y,z);
+                        scene.add( sphere );
+                    }
+                }
+                //console.log(scene.children);
+                const lineMat = new THREE.LineBasicMaterial( { color: 0x000000 } );
+                for (let a of scene.children){
+                    let numClose = 0;
+                    for (let b of scene.children){
+                        //console.log(a.position,b.position);
+                        let inter = new THREE.Vector3().subVectors(a.position,b.position);
+                        if (inter.length() < side_len*1.2 && inter.length()>side_len*0.5){
+                            numClose++
+                            /*let lineGeo = new THREE.BufferGeometry().setFromPoints([a.position,b.position]);
+                            scene.add(new THREE.Line( lineGeo, lineMat ));*/
+                        }
+                    }
+                    //console.log(numClose,a.id);
+                }
+                //console.log(sphere);
+            }
+            //const line = new THREE.Line( geometry, material );
+            addTonnetz(scene);
+            console.log(camera);
     
             var renderer = new THREE.WebGLRenderer({antialias:true});
             renderer.setSize(window.innerWidth, window.innerHeight);          
@@ -231,16 +277,13 @@
                 requestAnimationFrame(frame);
 
                 var delta = clock.getDelta();
-                
+                //console.log(frame);
                 update(delta);
 
                 render(delta);
 
             }
-            const colors = [0xff0000,0xff8000,0xffff00,0x80ff00,0x00ff00,0x00ff80,0x00ffff,0x0080ff,0x0000ff,0x8000ff,0xff00ff,0xff0080];
-            const noteToColor = (a) => {
-                return colors[a%colors.length];
-            }
+
             function update_key( obj, delta ){
                 if (obj.keyState == keyState.note_on)
                 {
@@ -278,7 +321,7 @@
                 {
                     update_key(keys_obj[i], delta);
                 }
-
+                //console.log(delta);
             }
         
             function render( delta )
@@ -360,12 +403,12 @@
             const releaseKeys = () => {
                 //console.log('release keys');
                 //console.log(Parser.parseCommands());
-                for (keyCode in keys_down){ 
+                for (keyCode in keys_down){
                     if (keys_down[keyCode]){
                         var note = keyCode_to_note(keyCode);
                         key_status(note, keyState.note_off);
                     }
-                }        
+                }
             }
             window.onblur = function(){
                 //console.log('blurred');
@@ -465,6 +508,7 @@
 
 
                     // make sure to remove any key pressed when changing the octave
+                    gui.add(controls, 'orbit');
                     gui.add(controls, 'key_attack_time',1, 10).step(1);
                     var octave = gui.add(controls, 'octave',0 , 3).step(1);
                     octave.onChange(releaseKeys());
@@ -499,10 +543,10 @@
     urchinTracker();
     </script>
 
-    <script type="text/javascript">
+    <!--script type="text/javascript">
     var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
     document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-    </script>
+    </script-->
     <script type="text/javascript">
     try
     {
