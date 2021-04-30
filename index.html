@@ -85,9 +85,8 @@ crossorigin="anonymous"></script>
                 this.key_max_rotation = 0.72;
                 this.octave = 1;
                 this.song = "Roundmidnight.mid";
+                this.key_color_scheme = 'monochrome';
                 this.monochrome = [ 128, 0, 255, 1.0 ];
-                this.chromatic = false;
-                this.color_by_fifths = false;
                 this.gui;
                 this.orbit=false;
                 this.play = function()
@@ -106,10 +105,18 @@ crossorigin="anonymous"></script>
             var camera = new THREE.PerspectiveCamera(30, window.innerWidth/window.innerHeight, 2.0, 5000);
             var keys_down = [];
             var keys_obj = [];
-
+            var noteOnColor = new THREE.Color().setRGB(controls.monochrome[0]/256.0, controls.monochrome[1]/256.0, controls.monochrome[2]/256.0);
+            
             const colors = [0xff0000,0xff8000,0xffff00,0x80ff00,0x00ff00,0x00ff80,0x00ffff,0x0080ff,0x0000ff,0x8000ff,0xff00ff,0xff0080];
             const noteToColor = (a) => {
-                return colors[a%colors.length];
+                switch (controls.key_color_scheme){
+                    case 'monochrome':
+                        return noteOnColor;
+                    case 'chromatic':
+                        return new THREE.Color(colors[a%colors.length]);
+                    case 'fifths':
+                        return new THREE.Color(colors[(7*a)%colors.length]);
+                }
             }
             const addTonnetz = (scene) => {
                 const grid_size = 7;
@@ -139,9 +146,11 @@ crossorigin="anonymous"></script>
                         //console.log(a.position,b.position);
                         let inter = new THREE.Vector3().subVectors(a.position,b.position);
                         if (inter.length() < side_len*1.2 && inter.length()>side_len*0.5){
-                            numClose++
-                            /*let lineGeo = new THREE.BufferGeometry().setFromPoints([a.position,b.position]);
-                            scene.add(new THREE.Line( lineGeo, lineMat ));*/
+                            numClose++;
+                            let lineGeo = new THREE.BufferGeometry();
+                            //console.log(lineGeo);
+                            lineGeo.attributes.position = new THREE.BufferAttribute( new Float32Array([a.position.x,a.position.y,a.position.z,b.position.x,b.position.y,b.position.z]), 3);
+                            scene.add(new THREE.Line( lineGeo, lineMat ));
                         }
                     }
                     //console.log(numClose,a.id);
@@ -172,8 +181,6 @@ crossorigin="anonymous"></script>
             floor.castShadow = true;
             scene.add( floor );
             scene.fog = new THREE.Fog( 0xffffff, 40, 50 );
-
-            noteOnColor = new THREE.Color().setRGB(controls.monochrome[0]/256.0, controls.monochrome[1]/256.0, controls.monochrome[2]/256.0);
 
             init_lights();
 
@@ -294,13 +301,7 @@ crossorigin="anonymous"></script>
                         obj.clock.elapsedTime = 0;
                     }
                     //console.log(obj)
-                    obj.material.color = noteOnColor;
-                    if (controls.chromatic){
-                        obj.material.color = new THREE.Color(noteToColor(obj.id/2));
-                    }
-                    if (controls.color_by_fifths){
-                        obj.material.color = new THREE.Color(noteToColor(7*obj.id/2));
-                    }
+                    obj.material.color = noteToColor(obj.id/2);
                 }
                 else if (obj.keyState == keyState.note_off)
                 {
@@ -399,6 +400,7 @@ crossorigin="anonymous"></script>
                     }
                     releaseKeys();
                 }
+                //console.log(controls.key_color_scheme);
             }
             const releaseKeys = () => {
                 //console.log('release keys');
@@ -509,7 +511,7 @@ crossorigin="anonymous"></script>
 
                     // make sure to remove any key pressed when changing the octave
                     gui.add(controls, 'orbit');
-                    gui.add(controls, 'key_attack_time',1, 10).step(1);
+                    //gui.add(controls, 'key_attack_time',1, 10).step(1);
                     var octave = gui.add(controls, 'octave',0 , 3).step(1);
                     octave.onChange(releaseKeys());
                     var keyColors = gui.addFolder('Key Colors');
@@ -518,8 +520,7 @@ crossorigin="anonymous"></script>
                                     {
                                         noteOnColor = new THREE.Color().setRGB(controls.monochrome[0]/256.0, controls.monochrome[1]/256.0, controls.monochrome[2]/256.0);;
                                     });
-                    keyColors.add(controls,'chromatic')
-                    keyColors.add(controls,'color_by_fifths')
+                    keyColors.add(controls,'key_color_scheme',{"Monochrome":'monochrome',"Chromatic":'chromatic',"Circle of Fifths":'fifths'}).name('Color Scheme');
                     var midiFolder = gui.addFolder('Player Piano');
                     var song = midiFolder.add(controls, 'song', songsToFiles);
                     song.onChange(function(value)
