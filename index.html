@@ -73,18 +73,6 @@ crossorigin="anonymous"></script>
                 message: "Loading Keyboard..."
             });
 
-            function smoothstep(a,b,x)
-            {
-                if( x<a ) return 0.0;
-                if( x>b ) return 1.0;
-                var y = (x-a)/(b-a);
-                return y*y*(3.0-2.0*y);
-            }
-            function mix(a,b,x)
-            {
-                return a + (b - a)*Math.min(Math.max(x,0.0),1.0);
-            }
-
             var controls = new function()
             {
                 this.key_attack_time = 4.0;
@@ -98,6 +86,7 @@ crossorigin="anonymous"></script>
                 this.gui;
                 this.tonnetz = true;
                 this.orbit=false;
+                this.sphereJump = 4;
                 this.play = function()
                     {
                         MIDI.Player.resume();
@@ -112,7 +101,6 @@ crossorigin="anonymous"></script>
             var scene = new THREE.Scene();
             var camera = new THREE.PerspectiveCamera(30, window.innerWidth/window.innerHeight, 2.0, 5000);
             var keys_down = [];
-            var chordStack = [];
             var keys_obj = [];
             var noteOnColor = new THREE.MeshPhongMaterial( {color: new THREE.Color().setRGB(controls.monochrome[0]/256.0, controls.monochrome[1]/256.0, controls.monochrome[2]/256.0)} );
 
@@ -172,7 +160,7 @@ crossorigin="anonymous"></script>
             cameraControls.target.set(6,0,-2);
 
             var clock = new THREE.Clock();
-
+            //console.log(keys_obj);
             function on_window_resize()
             {
                 camera.aspect = window.innerWidth / window.innerHeight;
@@ -220,30 +208,6 @@ crossorigin="anonymous"></script>
                 scene.add(collada.scene);
             }
 
-            function initialize_keys( obj)
-            {
-                keys_obj.push(obj);
-                obj.rotation.x = -Math.PI/4.0;
-                obj.rotation.y = 0;
-                obj.rotation.z = 0;
-                obj.keyState = keyState.unpressed;
-                obj.clock = new THREE.Clock(false);
-                obj.castShadow = true;
-                obj.receiveShadow = true;
-
-                // only add meshes in the material redefinition (to make keys change their color when pressed)
-                if (obj instanceof THREE.Mesh)
-                {
-                    old_material = obj.material;
-                    obj.material = new THREE.MeshPhongMaterial( { color:old_material.color} );
-                    obj.material.shininess = 35.0;
-                    obj.material.specular = new THREE.Color().setRGB(0.25, 0.25, 0.25);;
-                    obj.material.note_off = obj.material.color.clone();
-
-                }
-
-            }
-
             function frame()
             {
                 requestAnimationFrame(frame);
@@ -251,47 +215,17 @@ crossorigin="anonymous"></script>
                 var delta = clock.getDelta();
                 //console.log(frame);
                 update(delta);
-
                 render(delta);
-
-            }
-
-            function update_key( obj, delta ){
-                if (obj.keyState == keyState.note_on)
-                {
-                    obj.rotation.x = mix(-Math.PI/4.0, -controls.key_max_rotation, smoothstep(0.0, 1.0, controls.key_attack_time*obj.clock.getElapsedTime()));
-                    /*if (obj.rotation.x >= -controls.key_max_rotation)
-                    {
-                        obj.keyState = keyState.pressed;
-                        obj.clock.elapsedTime = 0;
-                    }*/
-                    //console.log(noteToColor(obj.id/2+6));
-                }
-                else if (obj.keyState == keyState.note_off)
-                {
-                    obj.rotation.x = mix(-controls.key_max_rotation, -Math.PI/4.0, smoothstep(0.0, 1.0, controls.key_attack_time*obj.clock.getElapsedTime()));
-                    /*
-                    if (obj.rotation.x <= -Math.PI/4.0)
-                    {
-                        obj.keyState = keyState.unpressed;
-                        obj.clock.elapsedTime = 0;
-                    }*/
-                    //obj.material.color = ;
-                }
             }
 
             function update( delta )
             {
-              if (controls.orbit){
-                cameraControls.autoRotate = true;
-              } else {
-                cameraControls.autoRotate = false;
-              }
               cameraControls.update(delta);
               for(i in keys_obj)
               {
                   update_key(keys_obj[i], delta);
               }
+              animateTonnetz(scene);
                 //console.log(delta);
             }
 
@@ -308,12 +242,14 @@ crossorigin="anonymous"></script>
                 releaseKeys();
             }
             window.onkeydown = function(ev)
-            {
+            {   
                 if (ev.keyCode == 9) {  //tab pressed
                     ev.preventDefault(); // stops its action
                 }
+                if(updateOctave(ev)) return;
                 if (keys_down[ev.keyCode] != true)
                 {
+                    //console.log(ev.keyCode);
                     var note = keyCode_to_note(ev.keyCode);
                     //console.log(note)
                     if (note != -1)
@@ -322,11 +258,11 @@ crossorigin="anonymous"></script>
                         keys_down[ev.keyCode] = true;
                     }
                 }
-                updateOctave(ev);
             }
 
             window.onkeyup = function(ev)
             {
+                if(updateOctave(ev)) return;
                 if (keys_down[ev.keyCode] == true)
                 {
                     var note = keyCode_to_note(ev.keyCode);
@@ -334,7 +270,6 @@ crossorigin="anonymous"></script>
                     keys_down[ev.keyCode] = false;
                     
                 }
-                updateOctave(ev);
             }
 
             window.onload = function ()
@@ -383,7 +318,7 @@ crossorigin="anonymous"></script>
                                     "No. 2 - Oriental, Granados": "gra_esp_2.mid",
                                     "Bohemian Rhapsody, Queen": "bohemian1.mid",
                                   };
-                makeGUI();
+                    makeGUI();
                 });
             };
 

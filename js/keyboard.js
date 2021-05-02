@@ -1,3 +1,26 @@
+function initialize_keys( obj)
+{
+    keys_obj.push(obj);
+    obj.rotation.x = -Math.PI/4.0;
+    obj.rotation.y = 0;
+    obj.rotation.z = 0;
+    obj.keyState = keyState.unpressed;
+    obj.clock = new THREE.Clock(false);
+    obj.castShadow = true;
+    obj.receiveShadow = true;
+
+    // only add meshes in the material redefinition (to make keys change their color when pressed)
+    if (obj instanceof THREE.Mesh)
+    {
+        //console.log(obj);
+        old_material = obj.material;
+        obj.material = new THREE.MeshPhongMaterial( { color:old_material.color} );
+        obj.material.shininess = 35.0;
+        obj.material.specular = new THREE.Color().setRGB(0.25, 0.25, 0.25);;
+        obj.material.note_off = obj.material.color.clone();
+        obj.material.note_on = noteToColor(parseInt(obj.name.slice(1))).color;
+    }
+}
 function key_status (keyName, status)
 {
     var obj = scene.getObjectByName(keyName, true);
@@ -7,12 +30,14 @@ function key_status (keyName, status)
         obj.clock.start();
         obj.clock.elapsedTime = 0;
         obj.keyState = status;
-        obj.material.color = (status == keyState.note_on) ? noteToColor(obj.id/2+6).color: obj.material.note_off;
+        //console.log(obj,note);
+        obj.material.color = (status == keyState.note_on) ? obj.material.note_on: obj.material.note_off;
         if (status == keyState.note_on){
             if (controls.instrument == 'AMSynth'){
                 //console.log(intToLetterName(note));
                 let velocity = Math.pow(2,-note/12);
                 AMSynth.triggerAttack(intToLetterName(note+12),0,velocity*1.5);
+                console.log(note);
             }
             if (controls.instrument == 'piano'){
                 piano.triggerAttack(intToLetterName(note));
@@ -22,7 +47,9 @@ function key_status (keyName, status)
                 MIDI.setVolume(0, 127);
                 MIDI.noteOn(0, note, velocity, delay);*/
             }
-            chordStack.push(note);
+            if (controls.tonnetz){
+                updateTonnetz(scene,note%12,true);
+            }
         }
         if (status == keyState.note_off){
             if (controls.instrument == 'AMSynth'){
@@ -36,10 +63,9 @@ function key_status (keyName, status)
                 MIDI.setVolume(0, 127);
                 MIDI.noteOff(0, note, delay + 0.08);*/
             }
-            chordStack.splice(chordStack.indexOf(note),1);
-        }
-        if (controls.tonnetz){
-            updateGrid(scene,chordStack);
+            if (controls.tonnetz){
+                updateTonnetz(scene,note%12,false);
+            }
         }
         //console.log(chordStack);
     }
@@ -58,7 +84,9 @@ const updateOctave = (ev) => {
             }
         }
         releaseKeys();
+        return true;
     }
+    return false;
     //console.log(controls.key_color_scheme);
 }
 const releaseKeys = () => {
@@ -66,12 +94,50 @@ const releaseKeys = () => {
     //console.log(Parser.parseCommands());
     for (keyCode in keys_down){
         if (keys_down[keyCode]){
+            console.log(keyCode);
             var note = keyCode_to_note(keyCode);
             key_status('_'+note, keyState.note_off);
         }
     }
     piano.releaseAll();
     AMSynth.releaseAll();
+}
+
+function smoothstep(a,b,x)
+{
+    if( x<a ) return 0.0;
+    if( x>b ) return 1.0;
+    var y = (x-a)/(b-a);
+    return y*y*(3.0-2.0*y);
+}
+function mix(a,b,x)
+{
+    return a + (b - a)*Math.min(Math.max(x,0.0),1.0);
+}
+function update_key( obj, delta ){
+    if (obj.keyState == keyState.note_on)
+    {
+        //console.log('updating');
+        obj.rotation.x = mix(-Math.PI/4.0, -controls.key_max_rotation, smoothstep(0.0, 1.0, controls.key_attack_time*obj.clock.getElapsedTime()));
+        if (obj.rotation.x >= -controls.key_max_rotation)
+        {
+            //console.log('deactivate');
+            obj.keyState = keyState.pressed;
+            obj.clock.elapsedTime = 0;
+        }
+    }
+    else if (obj.keyState == keyState.note_off)
+    {
+        //console.log('updating');
+        obj.rotation.x = mix(-controls.key_max_rotation, -Math.PI/4.0, smoothstep(0.0, 1.0, controls.key_attack_time*obj.clock.getElapsedTime()));
+        
+        if (obj.rotation.x <= -Math.PI/4.0)
+        {
+            //console.log('deactivate');
+            obj.keyState = keyState.unpressed;
+            obj.clock.elapsedTime = 0;
+        }
+    }
 }
 const intToLetterName = (n) =>{
     let letter;

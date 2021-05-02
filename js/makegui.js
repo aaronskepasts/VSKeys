@@ -6,7 +6,7 @@ const makeGUI = ()=>{
 
     // make sure to remove any key pressed when changing the octave
     gui.add(controls, 'instrument',{"Piano":'piano','AMSynth':'AMSynth'}).name('Instrument');
-    gui.add(controls, 'orbit');
+    gui.add(controls, 'orbit').onChange((val)=>{cameraControls.autoRotate = val});
     //gui.add(controls, 'key_attack_time',1, 10).step(1);
     var octave = gui.add(controls, 'octave',0 , 3).step(1);
     octave.onChange(releaseKeys());
@@ -21,6 +21,11 @@ const makeGUI = ()=>{
     keyColor.onChange((val)=>{
         for (let s of scene.sphereList){
             s.onColor = noteToColor(s.note);
+        }
+        //console.log(keys_obj[0].children[0]);
+        for (let k of keys_obj[0].children){
+            //console.log(k);
+            if (k.name.charAt(0)=='_') k.material.note_on = noteToColor(parseInt(k.name.slice(1))).color;
         }
         releaseKeys();
     })
