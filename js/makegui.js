@@ -5,13 +5,18 @@ const makeGUI = ()=>{
     //gui.add(controls, 'key_max_rotation',0.2 , 1.0);
 
     // make sure to remove any key pressed when changing the octave
+    gui.add(controls, 'tutorial').name('Tutorial').onChange(moveKeyLabels);
     gui.add(controls, 'instrument',{"Piano":'piano','AMSynth':'AMSynth'}).name('Instrument');
-    gui.add(controls, 'orbit').onChange((val)=>{cameraControls.autoRotate = val});
+    let orbit = gui.add(controls, 'orbit').name('Orbit');
+    orbit.onChange((val)=>{cameraControls.autoRotate = val});
     //gui.add(controls, 'key_attack_time',1, 10).step(1);
-    var octave = gui.add(controls, 'octave',0 , 3).step(1);
-    octave.onChange(releaseKeys());
+    var octave = gui.add(controls, 'octave',0 , 3).step(1).name('Octave');
+    octave.onChange((val)=>{
+        updateOctave(val);
+        moveKeyLabels();
+    });
     var keyColors = gui.addFolder('Key Colors');
-    var noteOnColorControl = keyColors.addColor(controls, 'monochrome');
+    var noteOnColorControl = keyColors.addColor(controls, 'monochrome').name('Monochrome');
     noteOnColorControl.onChange(function(value)
                     {
                         noteOnColor.color = new THREE.Color().setRGB(controls.monochrome[0]/256.0, controls.monochrome[1]/256.0, controls.monochrome[2]/256.0);
@@ -29,16 +34,6 @@ const makeGUI = ()=>{
         }
         releaseKeys();
     })
-    var midiFolder = gui.addFolder('Player Piano');
-    var song = midiFolder.add(controls, 'song', songsToFiles);
-    song.onChange(function(value)
-                    {
-                        MIDI.Player.stop();
-                        MIDI.Player.loadFile("midi/" + value, MIDI.Player.start);
-                    });
-    midiFolder.add(controls, 'play');
-    midiFolder.add(controls, 'stop');
-    //midiFolder.add(controls, 'playback_speed',0.25,2);
     // Visualizations
     var visualizations = gui.addFolder('Visualizations');
     var tonnetz = visualizations.add(controls, 'tonnetz').name('Tonnetz Grid');
@@ -51,4 +46,14 @@ const makeGUI = ()=>{
                                 l.visible = false;
                             }
                         });
+    var midiFolder = gui.addFolder('Player Piano');
+    var song = midiFolder.add(controls, 'song', songsToFiles);
+    song.onChange(function(value)
+                    {
+                        MIDI.Player.stop();
+                        MIDI.Player.loadFile("midi/" + value, MIDI.Player.start);
+                    });
+    midiFolder.add(controls, 'play');
+    midiFolder.add(controls, 'stop');
+    //midiFolder.add(controls, 'playback_speed',0.25,2);
 }

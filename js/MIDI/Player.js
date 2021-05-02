@@ -221,7 +221,7 @@ var startAudio = function (currentTime, fromCache) {
 				note = event.noteNumber - (root.MIDIOffset || 0);
 				eventQueue.push({
 					event: event,
-					source: MIDI.noteOn(channel, event.noteNumber, event.velocity, currentTime / 1000 + ctx.currentTime),
+					//source: MIDI.noteOn(channel, event.noteNumber, event.velocity, currentTime / 1000 + ctx.currentTime),
 					interval: scheduleTracking(channel, note, queuedTime, offset, 144, event.velocity)
 				});
 				messages ++;
@@ -231,7 +231,7 @@ var startAudio = function (currentTime, fromCache) {
 				note = event.noteNumber - (root.MIDIOffset || 0);
 				eventQueue.push({
 					event: event,
-					source: MIDI.noteOff(channel, event.noteNumber, currentTime / 1000 + ctx.currentTime),
+					//source: MIDI.noteOff(channel, event.noteNumber, currentTime / 1000 + ctx.currentTime),
 					interval: scheduleTracking(channel, note, queuedTime, offset, 128)
 				});
 				break;

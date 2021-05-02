@@ -1,6 +1,9 @@
 const newSynth = ()=>{
     //create a synth and connect it to the main output (your speakers)
-    return new Tone.PolySynth().toDestination();
+    let synth = new Tone.PolySynth().toDestination();
+    //const limiter = new Tone.Limiter(-20).toMaster();
+    //synth.connect(limiter);
+    return synth;
 }
 const newPiano = (href) => {
     const noteToMp3 = {

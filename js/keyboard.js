@@ -21,6 +21,104 @@ function initialize_keys( obj)
         obj.material.note_on = noteToColor(parseInt(obj.name.slice(1))).color;
     }
 }
+function initialize_tutorial (scene){
+    var loader = new THREE.FontLoader();
+    loader.load( 'fonts/droid_serif_bold.typeface.json', function ( font ) {
+        let textSettings = {
+            font: font,
+            size: 1.75,
+            height: 0.6,
+            curveSegments: 4,
+            bevelEnabled: true,
+            bevelThickness: 0.02,
+            bevelSize: 0.05,
+            bevelSegments: 3
+        };
+        evenKeySpacing();
+        let textMat = new THREE.MeshPhongMaterial({color:0x000000});
+        let key_offset = 0.29;
+        let keyLabels = new THREE.Group();
+        let hideableLabels = [];
+        let white_keys = ['Shift','Z','X','C','V','B','N','M',',','.','/','Tab','Q','W','E','R','T','Y','U','I','O','P','[',']','\\'];
+        for (let i = 0; i<white_keys.length; i++){
+            var geometry = new THREE.TextGeometry( white_keys[i], textSettings);
+            var mesh = new THREE.Mesh( geometry, textMat );
+            mesh.scale.fromArray([0.1,0.1,0.1]);
+            mesh.rotation.fromArray([-Math.PI/2,0,0]);
+            mesh.position.fromArray([2.22+key_offset*i,-0.31,1.2]);
+            if (i == 0 || i == 11) {
+                mesh.rotateZ(Math.PI/2);
+                mesh.translateX(-0.175);
+            }
+            else if (i == 7){mesh.translateX(-0.21);}
+            else if (i >= 8 && i <=10) {mesh.translateX(-0.125)}
+            else if (i == 19|| i==24) {mesh.translateX(-0.15);}
+            else if (i == 13) {mesh.translateX(-0.22);}
+            else if (i>13) {mesh.translateX(-0.175);}
+            else {mesh.translateX(-0.175);}
+            if (i>white_keys.length-3){
+                hideableLabels.push(mesh);
+            }
+            keyLabels.add( mesh );
+        }
+        textSettings.height = 0.1;
+        let black_keys = ['A','S','D','','G','H','','K','L',';','','1','2','','4','5','6','','8','9','','-','=','bksp'];
+        for (let i = 0; i<black_keys.length; i++){
+            if(!black_keys[i]){continue;}
+            var geometry = new THREE.TextGeometry( black_keys[i], textSettings);
+            var mesh = new THREE.Mesh( geometry, textMat );
+            mesh.scale.fromArray([0.1,0.1,0.1]);
+            mesh.rotation.fromArray([-Math.PI/2,0,0]);
+            mesh.position.fromArray([2.2+key_offset*i,-0.125,-0.6]);
+            if (i==9) mesh.translateX(0.05);
+            keyLabels.add( mesh );
+            if (i>black_keys.length-3){
+                hideableLabels.push(mesh);
+            }
+        }
+        geometry = new THREE.TextGeometry( 'Toggle Octave: CapsLock', textSettings);
+        mesh = new THREE.Mesh( geometry, textMat );
+        mesh.scale.fromArray([0.1,0.1,0.1]);
+        mesh.rotation.fromArray([-Math.PI/2,0,0]);
+        mesh.position.fromArray([4.4,-0.4,1.75]);
+        keyLabels.add( mesh );
+        scene.add(keyLabels);
+        keyLabels.hideable = hideableLabels;
+        scene.keyLabels = keyLabels;
+    });
+}
+function moveKeyLabels(){
+    let h = scene.keyLabels.hideable;
+    if (controls.tutorial){
+        for (let key of scene.keyLabels.children){key.visible = true;}
+        if (controls.octave == 3){
+            //console.log(h);
+            for (let key of h){key.visible = false;}
+        }
+    } else{
+        for (let key of scene.keyLabels.children){key.visible = false;}
+    }
+    scene.keyLabels.position.fromArray([2.03*(controls.octave-1),0,0]);
+}
+function evenKeySpacing(){
+    const keySpace = 29;
+    const xCenter = 0;
+    let numWhite = 0;
+    let numBlack = 0;
+    for (let i = 0; i < keys_obj.length-2; i++){
+        let mod = i%12;
+        if (mod == 1 ||mod == 3 ||mod == 6 ||mod == 8 ||mod == 10){
+            scene.getObjectByName('_'+i, true).position.x = xCenter-62+keySpace*numBlack;
+            numBlack++;
+            if (mod == 3 || mod == 10){
+                numBlack++;
+            }
+        }else {
+            scene.getObjectByName('_'+i, true).position.x = xCenter-77+keySpace*numWhite;
+            numWhite++;
+        }
+    }
+}
 function key_status (keyName, status)
 {
     var obj = scene.getObjectByName(keyName, true);
@@ -37,7 +135,7 @@ function key_status (keyName, status)
                 //console.log(intToLetterName(note));
                 let velocity = Math.pow(2,-note/12);
                 AMSynth.triggerAttack(intToLetterName(note+12),0,velocity*1.5);
-                console.log(note);
+                //console.log(note);
             }
             if (controls.instrument == 'piano'){
                 piano.triggerAttack(intToLetterName(note));
@@ -77,11 +175,17 @@ const updateOctave = (ev) => {
         }else {
             controls.octave=1;
         }
-        let trollers = controls.gui.__controllers;
-        for (let c of trollers){
-            if (c.property=='octave'){
-                c.setValue(controls.octave);
+        if (ev.key == 'CapsLock'){
+            let trollers = controls.gui.__controllers;
+            for (let c of trollers){
+                if (c.property=='octave'){
+                    c.setValue(controls.octave);
+                }
             }
+        }
+        //console.log('octave');
+        if (controls.tutorial){
+            moveKeyLabels();
         }
         releaseKeys();
         return true;
@@ -233,5 +337,4 @@ function keyCode_to_note( keyCode)
     note += controls.octave*12;
     //console.log(intToLetterName(note));
     return note;
-
 }

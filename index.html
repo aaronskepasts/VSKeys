@@ -1,16 +1,19 @@
 <html>
     <head>
         <title>VSKeys</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
-integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ=="
-crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
+        integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ=="
+        crossorigin="anonymous"></script>
 <!--script src="js/THREE.MeshLine.js"></script-->
-        <script src="js/three.js"></script>
+        <!--script src="js/three.js"></script-->
+        <script src="js/TGALoader.js"></script>
+        <script src="js/NewColladaLoader.js"></script>
         <script src="js/OrbitAndPanControls.js"></script>
-        <script src="js/ColladaLoader.js"></script>
+        <!--script src="js/ColladaLoader.js"></script-->
 
         <!-- Tone.js -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.4.9/Tone.js"></script>
+        <!--script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.4.9/Tone.js"></script-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.58/Tone.js" integrity="sha512-QhmI/idBFIq3hd9NsBFF8y6i5ziFjZP1bea5/J7piTjn6duaZ1LPsFuo26nTXeE1l98vOtXdNkHSzxVDmqVneg==" crossorigin="anonymous"></script>
 
         <!-- extras -->
         <script src="js/base64binary.js" type="text/javascript"></script>
@@ -41,12 +44,12 @@ crossorigin="anonymous"></script>
             }
             body
             {
-                color: rgb(0, 0, 0);
+                color: rgb(1, 1, 1);
                 font-family:Monospace;
                 font-size:13px;
                 text-align:center;
 
-                background-color: #fff;
+                background-color: #ffffff;
                 margin: 0px;
                 overflow: hidden;
             }
@@ -67,7 +70,7 @@ crossorigin="anonymous"></script>
     </head>
     <body>
         <script type="text/javascript">
-
+            //const THREE = require('three');
             // Begin MIDI loader widger
             MIDI.loader = new widgets.Loader({
                 message: "Loading Keyboard..."
@@ -75,11 +78,12 @@ crossorigin="anonymous"></script>
 
             var controls = new function()
             {
+                this.tutorial = true;
                 this.key_attack_time = 4.0;
                 this.playback_speed = 1.0;
                 this.key_max_rotation = 0.72;
                 this.octave = 1;
-                this.instrument = 'piano';
+                this.instrument = 'AMSynth';
                 this.song = "Roundmidnight.mid";
                 this.key_color_scheme = 'monochrome';
                 this.monochrome = [ 128, 0, 255, 1.0 ];
@@ -127,11 +131,11 @@ crossorigin="anonymous"></script>
 
             var renderer = new THREE.WebGLRenderer({antialias:true});
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.shadowMapEnabled = true;
+            renderer.shadowMap.type = true;
             renderer.shadowMapSoft = true;
-            renderer.shadowMapType = THREE.PCFSoftShadowMap;
-            renderer.gammaInput = true;
-            renderer.gammaOutput = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            //renderer.gammaInput = true;
+            //renderer.gammaOutput = true;
             renderer.physicallyBasedShading = true;
 
             document.body.appendChild(renderer.domElement);
@@ -148,8 +152,7 @@ crossorigin="anonymous"></script>
 
             init_lights();
 
-            var loader = new THREE.ColladaLoader();
-
+            var loader = new ColladaLoader();
             loader.load( 'obj/piano.dae', prepare_scene );
 
             camera.position.x = -3.77;
@@ -176,21 +179,21 @@ crossorigin="anonymous"></script>
 
                 spotlight.position.set(1.0,2.4,-7.5);
                 spotlight.target.position.set(6.0,-6,7);
-                spotlight.shadowCameraVisible = false;
-                spotlight.shadowDarkness = 0.75;
+                //spotlight.shadowCameraVisible = false;
+                //spotlight.shadowDarkness = 0.75;
                 spotlight.intensity = 1;
                 spotlight.castShadow = true;
-                spotlight.shadowMapWidth = 2048;
-                spotlight.shadowMapHeight = 2048;
+                spotlight.shadow.mapSize.width = 2048;
+                spotlight.shadow.mapSize.height = 2048;
 
-                spotlight.shadowCameraNear = 5.0;
-                spotlight.shadowCameraFar = 20.0;
-                spotlight.shadowBias = 0.0025;
+                spotlight.shadow.camera.near = 5.0;
+                spotlight.shadow.camera.far = 20.0;
+                spotlight.shadow.bias = 0.0025;
 
-                spotlight.shadowCameraLeft = -8.85;
-                spotlight.shadowCameraRight = 5.5;
-                spotlight.shadowCameraTop = 4;
-                spotlight.shadowCameraBottom = 0;
+                spotlight.shadow.camera.left = -8.85;
+                spotlight.shadow.camera.right = 5.5;
+                spotlight.shadow.camera.top = 4;
+                spotlight.shadow.camera.bottom = 0;
                 scene.add(spotlight);
 
                 var light = new THREE.DirectionalLight( 0xddffff, 0.5 );
@@ -200,12 +203,21 @@ crossorigin="anonymous"></script>
                 var light = new THREE.DirectionalLight( 0xff5555, 0.5 );
                 light.position.set( -1, -1, -1 ).normalize();
                 scene.add( light );
+
+                light = new THREE.HemisphereLight( 0xffffff, 0x080808, 0.3);
+                scene.add( light );
             }
 
             function prepare_scene( collada )
             {
                 collada.scene.traverse(initialize_keys);
                 scene.add(collada.scene);
+                var skyGeo = new THREE.SphereGeometry(100, 25, 25); 
+                var material = new THREE.MeshPhongMaterial({ color: 0xffffff});
+                var sky = new THREE.Mesh(skyGeo, material);
+                sky.material.side = THREE.BackSide;
+                scene.add(sky);
+                initialize_tutorial(scene);
             }
 
             function frame()
