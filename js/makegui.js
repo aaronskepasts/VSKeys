@@ -16,6 +16,7 @@ const makeGUI = ()=>{
         moveKeyLabels();
     });
     var keyColors = gui.addFolder('Key Colors');
+    keyColors.open();
     var noteOnColorControl = keyColors.addColor(controls, 'monochrome').name('Monochrome');
     noteOnColorControl.onChange(function(value)
                     {
@@ -35,25 +36,53 @@ const makeGUI = ()=>{
         releaseKeys();
     })
     // Visualizations
-    var visualizations = gui.addFolder('Visualizations');
-    var tonnetz = visualizations.add(controls, 'tonnetz').name('Tonnetz Grid');
-    tonnetz.onChange(function(val)
+    var visFolder = gui.addFolder('Visualizations');
+    visFolder.open();
+    var vis = visFolder.add(controls, 'visualize',{'Tonnetz Grid':'tonnetz','Spirograph':'spiro'}).name('Type');
+    vis.onChange(function(val)
                         {
-                            for (let s of scene.sphereList){
-                                s.visible = controls.tonnetz;
-                            }
                             for (let l of scene.lineList){
                                 l.visible = false;
                             }
+                            for (let s of scene.sphereList){
+                                s.visible = false;
+                            }
+                            scene.spiro.visible = false;
+                            switch (val){
+                                case 'tonnetz':
+                                    for (let s of scene.sphereList){
+                                        s.visible = true;
+                                    }
+                                    break;
+                                case 'spiro':
+                                    console.log('spirograph');
+                                    scene.spiro.visible = true;
+                            }
                         });
+    let spiroDir = visFolder.add(scene.spiro,'dir',{'Positive':'pos','Alternating':'alt','Custom':'custom'}).name('SpiroSign');
+    visFolder.add(scene.spiro,'customStr').name('Custom Spirograph').onFinishChange((str)=>{
+        let signArr = [];
+        for (let i = 0; i<str.length; i++){
+            let c = str.charAt(i);
+            if (c != '+' && c != '-'){
+                scene.spiro.customSign = [];
+                spiroDir.setValue('pos');
+                return;
+            }
+            if (c == '+') signArr.push(1);
+            if (c == '-') signArr.push(-1);
+        }
+        scene.spiro.customSign = signArr;
+    });
     var midiFolder = gui.addFolder('Player Piano');
-    var song = midiFolder.add(controls, 'song', songsToFiles);
+    midiFolder.open()
+    var song = midiFolder.add(controls, 'song', songsToFiles).name('Song');
     song.onChange(function(value)
                     {
                         MIDI.Player.stop();
                         MIDI.Player.loadFile("midi/" + value, MIDI.Player.start);
                     });
-    midiFolder.add(controls, 'play');
-    midiFolder.add(controls, 'stop');
+    midiFolder.add(controls, 'play').name('Play');
+    midiFolder.add(controls, 'stop').name('Stop');
     //midiFolder.add(controls, 'playback_speed',0.25,2);
 }

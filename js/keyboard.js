@@ -145,8 +145,11 @@ function key_status (keyName, status)
                 MIDI.setVolume(0, 127);
                 MIDI.noteOn(0, note, velocity, delay);*/
             }
-            if (controls.tonnetz){
-                updateTonnetz(scene,note%12,true);
+            if (controls.visualize == 'tonnetz'){
+                updateTonnetz(scene,note,true);
+            }
+            if (controls.visualize == 'spiro'){
+                updateSpiro(scene, note, true);
             }
         }
         if (status == keyState.note_off){
@@ -161,8 +164,11 @@ function key_status (keyName, status)
                 MIDI.setVolume(0, 127);
                 MIDI.noteOff(0, note, delay + 0.08);*/
             }
-            if (controls.tonnetz){
-                updateTonnetz(scene,note%12,false);
+            if (controls.visualize == 'tonnetz'){
+                updateTonnetz(scene,note,false);
+            }
+            if (controls.visualize == 'spiro'){
+                updateSpiro(scene, note, false);
             }
         }
         //console.log(chordStack);

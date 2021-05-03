@@ -21,6 +21,7 @@
         <script src="js/instrument.js" type="text/javascript"></script>
         <script src="js/tonnetz.js" type="text/javascript"></script>
         <script src="js/makegui.js" type="text/javascript"></script>
+        <script src="js/spirograph.js" type="text/javascript"></script>
 
         <script src="js/MIDI/AudioDetect.js" type="text/javascript"></script>
         <script src="js/MIDI/LoadPlugin.js" type="text/javascript"></script>
@@ -88,8 +89,9 @@
                 this.key_color_scheme = 'monochrome';
                 this.monochrome = [ 128, 0, 255, 1.0 ];
                 this.gui;
-                this.tonnetz = true;
+                this.visualize = 'tonnetz';
                 this.orbit=false;
+                this.floorColor = 0xf0eff0;
                 this.sphereJump = 4;
                 this.play = function()
                     {
@@ -125,6 +127,7 @@
             }
             //const line = new THREE.Line( geometry, material );
             addTonnetz(scene);
+            addSpirograph(scene,controls.floorColor);
             AMSynth = newSynth();
             //console.log(keys_obj);
             let piano = newPiano(window.location.href);
@@ -142,7 +145,7 @@
 
             var material = new THREE.MeshLambertMaterial( { color: 0x606060} )
 
-            let floor = new THREE.Mesh( new THREE.PlaneGeometry( 8000, 8000 ), new THREE.MeshBasicMaterial( { color: 0xf0f0f0 } ) );
+            let floor = new THREE.Mesh( new THREE.PlaneGeometry( 8000, 8000 ), new THREE.MeshBasicMaterial( { color: controls.floorColor } ) );
             floor.rotation.x = - 90 * ( Math.PI / 180 );
             floor.position.y = -0.45;
             floor.receiveShadow = true;
@@ -151,7 +154,6 @@
             scene.fog = new THREE.Fog( 0xffffff, 40, 50 );
 
             init_lights();
-
             var loader = new ColladaLoader();
             loader.load( 'obj/piano.dae', prepare_scene );
 
@@ -237,7 +239,9 @@
               {
                   update_key(keys_obj[i], delta);
               }
-              animateTonnetz(scene);
+              if (controls.visualize == 'tonnetz'){
+                animateTonnetz(scene);
+              }
                 //console.log(delta);
             }
 
@@ -263,7 +267,6 @@
                 {
                     //console.log(ev.keyCode);
                     var note = keyCode_to_note(ev.keyCode);
-                    //console.log(note)
                     if (note != -1)
                     {
                         key_status('_'+String(note), keyState.note_on);

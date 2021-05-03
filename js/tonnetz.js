@@ -67,7 +67,7 @@ const addTonnetz = (scene) => {
     //console.log(lineList);
     scene.sphereList = sphereList;
     scene.lineList = lineList;
-    scene.chord = {};
+    scene.chord = [0,0,0,0,0,0,0,0,0,0,0,0];
 }
 const updateTonnetz = (scene, note, on) => {
     /*
@@ -75,8 +75,9 @@ const updateTonnetz = (scene, note, on) => {
         s.material = s.offColor;
         //s.visible = false;
     }*/
+    note%=12;
     if (on){
-        scene.chord[note]=true;
+        scene.chord[note]++;
         for (let s of scene.sphereList){
             if (s.note==note){
                 if (s.on != true){
@@ -85,34 +86,37 @@ const updateTonnetz = (scene, note, on) => {
                 }
                 s.material = s.onColor;
                 s.on = true;
+                //console.log(note);
                 //s.visible = true;
             }
         }
     } else {
-        scene.chord[note]=false;
-        for (let s of scene.sphereList){
-            if (s.note==note){
-                if (s.on != false){
-                    s.clock.start();
-                    s.clock.elapsedTime = 0;
+        scene.chord[note]--;
+        if (scene.chord[note] <= 0){
+            for (let s of scene.sphereList){
+                if (s.note==note){
+                    if (s.on != false){
+                        s.clock.start();
+                        s.clock.elapsedTime = 0;
+                    }
+                    s.material = s.offColor;
+                    s.on = false;
+                    //s.visible = true;
                 }
-                s.material = s.offColor;
-                s.on = false;
-                //s.visible = true;
             }
         }
     }
+    //console.log(note, scene.chord, on);
     for (let l of scene.lineList){
         l.visible = false;
     }
     let chord = [];
     for (let i in scene.chord){
-        if (scene.chord[i]){
+        if (scene.chord[i]>0){
             chord.push(parseInt(i));
         }
     }
     chord.sort(function(a,b){return a - b});
-    //console.log(chord);
     for (let i = 0; i<chord.length-1; i++){
         for (let j = i+1; j<chord.length; j++){
             for (let l of scene.lineList){
@@ -123,12 +127,12 @@ const updateTonnetz = (scene, note, on) => {
         }
     }
 }
-const animateTonnetz = (scene, delta) =>{
+const animateTonnetz = (scene) =>{
     for (let s of scene.sphereList){
-        if (s.on==true){
+        //console.log(s);
+        if (s.on == true){
             if (s.scale.y==controls.sphereJump){
                 s.on = 2;
-                //console.log(s);
                 //s.scale.multiplyScalar(1.5);
             } else{
                 let h =mix(s.minHeight,controls.sphereJump, smoothstep(0.0, 1.0, controls.key_attack_time*s.clock.getElapsedTime()));
