@@ -151,6 +151,9 @@ function key_status (keyName, status)
             if (controls.visualize == 'spiro'){
                 updateSpiro(scene, note, true);
             }
+            if (controls.visualize == 'spiro3D'){
+                updateSpiro3D(scene, note, true);
+            }
         }
         if (status == keyState.note_off){
             if (controls.instrument == 'AMSynth'){
@@ -169,6 +172,9 @@ function key_status (keyName, status)
             }
             if (controls.visualize == 'spiro'){
                 updateSpiro(scene, note, false);
+            }
+            if (controls.visualize == 'spiro3D'){
+                updateSpiro3D(scene, note, false);
             }
         }
         //console.log(chordStack);
@@ -240,7 +246,7 @@ function update_key( obj, delta ){
     {
         //console.log('updating');
         obj.rotation.x = mix(-controls.key_max_rotation, -Math.PI/4.0, smoothstep(0.0, 1.0, controls.key_attack_time*obj.clock.getElapsedTime()));
-        
+
         if (obj.rotation.x <= -Math.PI/4.0)
         {
             //console.log('deactivate');

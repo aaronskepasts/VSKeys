@@ -38,7 +38,7 @@ const makeGUI = ()=>{
     // Visualizations
     var visFolder = gui.addFolder('Visualizations');
     visFolder.open();
-    var vis = visFolder.add(controls, 'visualize',{'Tonnetz Grid':'tonnetz','Spirograph':'spiro'}).name('Type');
+    var vis = visFolder.add(controls, 'visualize',{'Tonnetz Grid':'tonnetz','Spirograph':'spiro', '3D Spirograph': 'spiro3D'}).name('Type');
     vis.onChange(function(val)
                         {
                             for (let l of scene.lineList){
@@ -57,6 +57,10 @@ const makeGUI = ()=>{
                                 case 'spiro':
                                     console.log('spirograph');
                                     scene.spiro.visible = true;
+                                    break;
+                                case 'spiro3D':
+                                    console.log("spiro3D");
+                                    scene.spiro3D.visible = true;
                             }
                         });
     let spiroDir = visFolder.add(scene.spiro,'dir',{'Positive':'pos','Alternating':'alt','Custom':'custom'}).name('SpiroSign');
