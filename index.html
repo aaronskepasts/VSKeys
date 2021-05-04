@@ -14,7 +14,9 @@
         <!-- Tone.js -->
         <!--script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.4.9/Tone.js"></script-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.58/Tone.js" integrity="sha512-QhmI/idBFIq3hd9NsBFF8y6i5ziFjZP1bea5/J7piTjn6duaZ1LPsFuo26nTXeE1l98vOtXdNkHSzxVDmqVneg==" crossorigin="anonymous"></script>
-
+        <!--Shepherd-->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shepherd.js/8.0.0/css/shepherd.css" integrity="sha512-sc/EXnTEcinxW2Pq4YgmUhkkUwQi9SaEVWa7uFbuRNd+pVxZQFJemkfEcy7je31+rY3rgR3Tf0x3C2lmwlylYg==" crossorigin="anonymous" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/shepherd.js/8.0.0/js/shepherd.min.js" integrity="sha512-g6UoKc+cPrVq13/iMhDdv+shNha5ZZ9HeEc+qPK7zFulktsi82ajrlXt14o6qFGG504f5U3+B16JtwGIAUAgfQ==" crossorigin="anonymous"></script>
         <!-- extras -->
         <script src="js/base64binary.js" type="text/javascript"></script>
         <script src="js/keyboard.js" type="text/javascript"></script>
@@ -23,6 +25,7 @@
         <script src="js/makegui.js" type="text/javascript"></script>
         <script src="js/spirograph.js" type="text/javascript"></script>
         <script src="js/spirograph3D.js" type="text/javascript"></script>
+        <script src="js/tour.js" type="text/javascript"></script>
 
         <script src="js/MIDI/AudioDetect.js" type="text/javascript"></script>
         <script src="js/MIDI/LoadPlugin.js" type="text/javascript"></script>
@@ -67,6 +70,13 @@
             {
                 color: #1e83ff;
             }
+             .shepherd-arrow:before {
+                 position: absolute;
+                 width: 16px;
+                 height: 16px;
+                 right: 0px;
+                 z-index: -1;
+             }
 
         </style>
     </head>
@@ -111,7 +121,7 @@
             var keys_obj = [];
             var noteOnColor = new THREE.MeshPhongMaterial( {color: new THREE.Color().setRGB(controls.monochrome[0]/256.0, controls.monochrome[1]/256.0, controls.monochrome[2]/256.0)} );
 
-            let colors = [0xff0000,0xff8000,0xffff00,0x80ff00,0x00ff00,0x00ff80,0x00ffff,0x0080ff,0x0000ff,0x8000ff,0xff00ff,0xff0080];
+            let colors = [0xff0000,0xff6600,0xffaa00, 0xffff00,0xaaff55,0x55ffaa,0x00ffff, 0x00a0ff,0x0000ff,0x8000ff,0xff00ff,0xff0080];
             for (let i = 0; i<colors.length; i++){
                 colors[i] = new THREE.MeshPhongMaterial( {color: colors[i]} );
             }
@@ -129,7 +139,6 @@
             //const line = new THREE.Line( geometry, material );
             addTonnetz(scene);
             addSpirograph(scene,controls.floorColor);
-            addSpirograph3D(scene);
             AMSynth = newSynth();
             //console.log(keys_obj);
             let piano = newPiano(window.location.href);
@@ -168,6 +177,7 @@
 
             var clock = new THREE.Clock();
             //console.log(keys_obj);
+
             function on_window_resize()
             {
                 camera.aspect = window.innerWidth / window.innerHeight;
@@ -337,6 +347,8 @@
                                     "P 1": "P3.mid"
                                   };
                     makeGUI();
+                    var tour = loadTour();
+                    tour.start();
                 });
             };
 

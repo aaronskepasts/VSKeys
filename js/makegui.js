@@ -5,16 +5,42 @@ const makeGUI = ()=>{
     //gui.add(controls, 'key_max_rotation',0.2 , 1.0);
 
     // make sure to remove any key pressed when changing the octave
-    gui.add(controls, 'tutorial').name('Tutorial').onChange(moveKeyLabels);
     gui.add(controls, 'instrument',{"Piano":'piano','AMSynth':'AMSynth'}).name('Instrument');
     let orbit = gui.add(controls, 'orbit').name('Orbit');
     orbit.onChange((val)=>{cameraControls.autoRotate = val});
     //gui.add(controls, 'key_attack_time',1, 10).step(1);
+    gui.add(controls, 'tutorial').name('Show Controls').onChange(moveKeyLabels);
     var octave = gui.add(controls, 'octave',0 , 3).step(1).name('Octave');
     octave.onChange((val)=>{
         updateOctave(val);
         moveKeyLabels();
     });
+    var vis = gui.add(controls, 'visualize',{'Tonnetz Grid':'tonnetz','Spirograph':'spiro', '3D Spirograph': 'spiro3D'}).name('Visualization');
+    vis.onChange(function(val)
+        {
+            for (let l of scene.lineList){
+                l.visible = false;
+            }
+            for (let s of scene.sphereList){
+                s.visible = false;
+            }
+            scene.spiro.visible = false;
+            scene.spiro3D.visible = false;
+            switch (val){
+                case 'tonnetz':
+                    for (let s of scene.sphereList){
+                        s.visible = true;
+                    }
+                    break;
+                case 'spiro':
+                    console.log('spirograph');
+                    scene.spiro.visible = true;
+                    break;
+                case 'spiro3D':
+                    console.log("spiro3D");
+                    scene.spiro3D.visible = true;
+            }
+        });
     var keyColors = gui.addFolder('Key Colors');
     keyColors.open();
     var noteOnColorControl = keyColors.addColor(controls, 'monochrome').name('Monochrome');
@@ -22,6 +48,10 @@ const makeGUI = ()=>{
                     {
                         noteOnColor.color = new THREE.Color().setRGB(controls.monochrome[0]/256.0, controls.monochrome[1]/256.0, controls.monochrome[2]/256.0);
                         //console.log(noteOnColor);
+                        for (let k of keys_obj[0].children){
+                            //console.log(k);
+                            if (k.name.charAt(0)=='_') k.material.note_on = noteToColor(parseInt(k.name.slice(1))).color;
+                        }
                     });
     var keyColor = keyColors.add(controls,'key_color_scheme',{"Monochrome":'monochrome',"Chromatic":'chromatic',"Circle of Fifths":'fifths'}).name('Color Scheme');
     keyColor.onChange((val)=>{
@@ -36,34 +66,9 @@ const makeGUI = ()=>{
         releaseKeys();
     })
     // Visualizations
-    var visFolder = gui.addFolder('Visualizations');
+    var visFolder = gui.addFolder('Spirograph Settings');
     visFolder.open();
-    var vis = visFolder.add(controls, 'visualize',{'Tonnetz Grid':'tonnetz','Spirograph':'spiro', '3D Spirograph': 'spiro3D'}).name('Type');
-    vis.onChange(function(val)
-                        {
-                            for (let l of scene.lineList){
-                                l.visible = false;
-                            }
-                            for (let s of scene.sphereList){
-                                s.visible = false;
-                            }
-                            scene.spiro.visible = false;
-                            switch (val){
-                                case 'tonnetz':
-                                    for (let s of scene.sphereList){
-                                        s.visible = true;
-                                    }
-                                    break;
-                                case 'spiro':
-                                    console.log('spirograph');
-                                    scene.spiro.visible = true;
-                                    break;
-                                case 'spiro3D':
-                                    console.log("spiro3D");
-                                    scene.spiro3D.visible = true;
-                            }
-                        });
-    let spiroDir = visFolder.add(scene.spiro,'dir',{'Positive':'pos','Alternating':'alt','Custom':'custom'}).name('SpiroSign');
+    let spiroDir = visFolder.add(scene.spiro,'dir',{'Positive':'pos','Alternating':'alt','Custom':'custom'}).name('Spirograph Sign');
     visFolder.add(scene.spiro,'customStr').name('Custom Spirograph').onFinishChange((str)=>{
         let signArr = [];
         for (let i = 0; i<str.length; i++){

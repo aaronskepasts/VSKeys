@@ -6,6 +6,7 @@ function addSpirograph(scene, color){
     ctx.fillStyle = ConvertHexToString(color);
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height); 
     const texture = new THREE.CanvasTexture(ctx.canvas);
+    texture.wrapS = THREE.MirroredRepeatWrapping;
     //console.log(texture);
     
     const geometry = new THREE.PlaneGeometry( 9, 8, 2);
@@ -13,6 +14,7 @@ function addSpirograph(scene, color){
       map: texture,
     });
     let graph = new THREE.Mesh(geometry, material);
+    graph.material.side = THREE.DoubleSide;
     graph.visible = false;
     graph.dir = 'pos';
     graph.customStr = '';
@@ -23,10 +25,20 @@ function addSpirograph(scene, color){
     graph.position.fromArray([6,-0.4,-5]);
     graph.rotateX(-Math.PI/2);
     scene.add(graph);
+
+    let mat = new THREE.LineBasicMaterial({color: 0x0000ff,linewidth: 1});
+    let geo = new THREE.BufferGeometry();
+  
+    var line = new THREE.Line( geo, mat );
+    line.visible = false;
+    scene.spiro3D = line;
+    scene.add(line);
+    scene.counter = 0;
+
     scene.pitches = {};
     //drawGraph([0,4,7]);
   }
-function updateSpiro(scene, pitch, on){
+function updateSpiro(scene, pitch, on, dim){
   if (on){
       scene.pitches[pitch]=true;
   } else {
@@ -41,20 +53,30 @@ function updateSpiro(scene, pitch, on){
   }
   //console.log(pitches);
   //if (pitches.length>0){
-  drawGraph(pitches);
-  scene.spiro.txtr.needsUpdate = true;
+  if (dim == 2){
+    drawGraph(pitches);
+    scene.spiro.txtr.needsUpdate = true;
+  }
+  if (dim == 3){
+    scene.spiro3D.geometry.dispose();
+    if (pitches.length>0) draw3DGraph(pitches);
+    else scene.spiro3D.geometry = new THREE.BufferGeometry();
+  }
 }
   
 function drawGraph(notes){
   let ctx = scene.spiro.txtr.ctx;
+  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height); 
+  if (notes.length == 0) return;
+
   let signArr = scene.spiro.customSign;
   let alt = scene.spiro.dir == 'alt';
   let custom = scene.spiro.dir == 'custom';
   //console.log(signArr);
-  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height); 
   //console.log(ctx);
   notes.sort(function(a,b){return a - b});
   let min = notes[0];
+  ctx.strokeStyle = '#'+noteToColor(min).color.getHexString();
   notes = notes.map(function(val){return val - min;});
   let freq = [];
   let freqSum = 0;
@@ -91,4 +113,41 @@ function ConvertHexToString(str) {
   let hex = '#'+str.toString(16);
   //let tri = hex.charAt(0)+hex.charAt(1)+hex.charAt(3)+hex.charAt(5);
   return hex;
+}
+
+function draw3DGraph(notes){
+  let alt = scene.spiro.dir == 'alt';
+  let custom = scene.spiro.dir == 'custom';
+  // store spiro3D points and set start point
+  const points = [];
+  // points.push( new THREE.Vector3( 6, 0,-9 ) );
+
+  notes.sort(function(a,b){return a - b});
+  let min = notes[0];
+  notes = notes.map(function(val){return val - min;});
+  let freq = [];
+  let freqSum = 0;
+  for (let n of notes){
+    let f = notesToRatios[n%12]*Math.pow(2,Math.floor(n/12));
+    freqSum+=1/f;
+    freq.push(f);
+  }
+
+  const scale = 2/(freqSum);
+  let z = -5;
+  for (let t = 0; t<Math.PI*96; t+=0.125){
+    let x = 6;
+    let y = 2;
+    for (let i = 0; i<freq.length; i++){
+      let r = freq[i];
+      let sign = 1;
+      if (custom && i<signArr.length) sign = signArr[i];
+      if (alt) sign = i%2 == 0 ? 1: -1;
+      x+=scale*Math.sin(r*t*sign)/r;
+      y+=scale*Math.cos(r*t*sign)/r;
+    }
+    z += 0.00125;
+    points.push( new THREE.Vector3( x, y,z ) );
+  }
+  scene.spiro3D.geometry = new THREE.BufferGeometry().setFromPoints( points );
 }

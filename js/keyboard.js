@@ -149,10 +149,10 @@ function key_status (keyName, status)
                 updateTonnetz(scene,note,true);
             }
             if (controls.visualize == 'spiro'){
-                updateSpiro(scene, note, true);
+                updateSpiro(scene, note, true, 2);
             }
             if (controls.visualize == 'spiro3D'){
-                updateSpiro3D(scene, note, true);
+                updateSpiro(scene, note, true, 3);
             }
         }
         if (status == keyState.note_off){
@@ -171,10 +171,10 @@ function key_status (keyName, status)
                 updateTonnetz(scene,note,false);
             }
             if (controls.visualize == 'spiro'){
-                updateSpiro(scene, note, false);
+                updateSpiro(scene, note, false, 2);
             }
             if (controls.visualize == 'spiro3D'){
-                updateSpiro3D(scene, note, false);
+                updateSpiro(scene, note, false, 3);
             }
         }
         //console.log(chordStack);
@@ -252,6 +252,8 @@ function update_key( obj, delta ){
             //console.log('deactivate');
             obj.keyState = keyState.unpressed;
             obj.clock.elapsedTime = 0;
+            AMSynth.triggerRelease(intToLetterName(parseInt(obj.name.substring(1))+12));
+            piano.triggerRelease(intToLetterName(parseInt(obj.name.substring(1))));
         }
     }
 }
