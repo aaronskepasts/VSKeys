@@ -101,6 +101,7 @@
                 this.monochrome = [ 128, 0, 255, 1.0 ];
                 this.gui;
                 this.visualize = 'tonnetz';
+                this.scale3D = 1;
                 this.orbit=false;
                 this.floorColor = 0xf0eff0;
                 this.sphereJump = 4;
@@ -157,11 +158,12 @@
 
             var material = new THREE.MeshLambertMaterial( { color: 0x555555} )
 
-            let floor = new THREE.Mesh( new THREE.PlaneGeometry( 8000, 8000 ), new THREE.MeshBasicMaterial( { color: controls.floorColor } ) );
+            var floor = new THREE.Mesh( new THREE.PlaneGeometry( 8000, 8000 ), new THREE.MeshBasicMaterial( { color: controls.floorColor } ) );
             floor.rotation.x = - 90 * ( Math.PI / 180 );
             floor.position.y = -0.45;
             floor.receiveShadow = true;
             floor.castShadow = true;
+            scene.floor = floor;
             scene.add( floor );
             scene.fog = new THREE.Fog( 0x000000, 40, 50 );
 

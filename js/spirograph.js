@@ -17,7 +17,7 @@ function addSpirograph(scene, color){
     graph.ctx = ctx;
     graph.material.side = THREE.DoubleSide;
     graph.visible = false;
-    graph.dir = 'pos';
+    graph.dir = 'alt';
     graph.customStr = '';
     graph.customSign = [];
     graph.clock = new THREE.Clock(false);
@@ -39,8 +39,10 @@ function addSpirograph(scene, color){
     const pMat = new THREE.PointsMaterial({ color: color, size: 0.1 });
     var particles = new THREE.Points(geo, pMat);
     particles.visible = false;
+    particles.position.fromArray([6, 2, -5]);
     scene.spiro3D = particles;
     scene.spiro3D.color = color;
+
     scene.add(particles);
 
     scene.pitches = {};
@@ -149,10 +151,10 @@ function draw3DGraph(notes){
   }
 
   const scale = 2/(freqSum);
-  let z = -5;
+  let z = -Math.PI*96/0.125*0.0013/2;
   for (let t = 0; t<Math.PI*96; t+=0.125){
-    let x = 6;
-    let y = 2;
+    let x = 0;
+    let y = 0;
     for (let i = 0; i<freq.length; i++){
       let r = freq[i];
       let sign = 1;
@@ -161,7 +163,7 @@ function draw3DGraph(notes){
       x+=scale*Math.sin(r*t*sign)/r;
       y+=scale*Math.cos(r*t*sign)/r;
     }
-    z += 0.00125;
+    z += 0.0013;
     points.push( new THREE.Vector3( x, y,z ) );
   }
   scene.spiro3D.geometry = new THREE.BufferGeometry().setFromPoints( points );

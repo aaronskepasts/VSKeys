@@ -26,6 +26,7 @@ const makeGUI = ()=>{
             }
             scene.spiro.visible = false;
             scene.spiro3D.visible = false;
+            scene.floor.visible = true;
             switch (val){
                 case 'tonnetz':
                     for (let s of scene.sphereList){
@@ -43,13 +44,14 @@ const makeGUI = ()=>{
                 case 'spiro3D':
                     console.log("spiro3D");
                     scene.spiro3D.visible = true;
+                    scene.floor.visible = false;
             }
         });
     var keyColors = gui.addFolder('Key Colors');
     keyColors.open();
     var noteOnColorControl = keyColors.addColor(controls, 'monochrome').name('Monochrome');
     noteOnColorControl.onChange(function(value)
-                    {   
+                    {
                         let color = parseInt(value.substring(1),16);
                         noteOnColor.color = new THREE.Color(color);
                         //console.log(value, controls.monochrome, color);
@@ -87,6 +89,12 @@ const makeGUI = ()=>{
             if (c == '-') signArr.push(-1);
         }
         scene.spiro.customSign = signArr;
+    });
+
+    var scale3D = visFolder.add(controls, 'scale3D', 0.1, 3).step(0.1).name('Scale');
+    scene.spiro.scale3D = scale3D.initialValue;
+    scale3D.onChange((val)=>{
+        scene.spiro3D.scale.fromArray([val, val, val]);
     });
     var midiFolder = gui.addFolder('Player Piano');
     midiFolder.open()
