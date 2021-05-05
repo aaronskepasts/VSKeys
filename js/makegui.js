@@ -91,10 +91,24 @@ const makeGUI = ()=>{
         scene.spiro.customSign = signArr;
     });
 
-    var scale3D = visFolder.add(controls, 'scale3D', 0.1, 3).step(0.1).name('Scale');
-    scene.spiro.scale3D = scale3D.initialValue;
+    var scale3D = visFolder.add(controls, 'scale3D', 0.1, 3).step(0.01).name('Scale');
     scale3D.onChange((val)=>{
         scene.spiro3D.scale.fromArray([val, val, val]);
+    });
+    var rotateX = visFolder.add(controls, 'rotateX', -Math.PI, Math.PI).step(0.1).name('Rotate X');
+    rotateX.initialValue = 0;
+    rotateX.onChange((val)=>{
+        scene.spiro3D.rotation.fromArray([val, scene.spiro3D.rotation.y, scene.spiro3D.rotation.z]);
+    });
+    var rotateY = visFolder.add(controls, 'rotateY', -Math.PI, Math.PI).step(0.01).name('Rotate Y');
+    rotateY.initialValue = 0;
+    rotateY.onChange((val)=>{
+        scene.spiro3D.rotation.fromArray([scene.spiro3D.rotation.x, val, scene.spiro3D.rotation.z]);
+    });
+    var rotateZ = visFolder.add(controls, 'rotateZ', -Math.PI, Math.PI).step(0.01).name('Rotate Z');
+    rotateZ.initialValue = 0;
+    rotateZ.onChange((val)=>{
+        scene.spiro3D.rotation.fromArray([scene.spiro3D.rotation.x, scene.spiro3D.rotation.y, val]);
     });
     var midiFolder = gui.addFolder('Player Piano');
     midiFolder.open()
