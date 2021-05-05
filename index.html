@@ -121,7 +121,8 @@
             var keys_obj = [];
             var noteOnColor = new THREE.MeshPhongMaterial( {color: new THREE.Color().setRGB(controls.monochrome[0]/256.0, controls.monochrome[1]/256.0, controls.monochrome[2]/256.0)} );
 
-            let colors = [0xff0000,0xff6600,0xffaa00, 0xffff00,0xaaff55,0x55ffaa,0x00ffff, 0x00a0ff,0x0000ff,0x8000ff,0xff00ff,0xff0080];
+            //let colors = [0xff0000,0xff6600,0xffaa00, 0xffff00,0xaaff55,0x55ffaa,0x00ffff, 0x00a0ff,0x0000ff,0x8000ff,0xff00ff,0xff0080];
+            let colors = [0xe3242b,0xff8000,0xffbf00, 0xffff00,0x66ff00,0x47E28F,0x00ffff, 0x00a0ff,0x9089FA,0x8000ff,0xcc00dd,0xff00a0];
             for (let i = 0; i<colors.length; i++){
                 colors[i] = new THREE.MeshPhongMaterial( {color: colors[i]} );
             }
@@ -254,7 +255,7 @@
               if (controls.visualize == 'tonnetz'){
                 animateTonnetz(scene);
               }
-                //console.log(delta);
+              if (controls.visualize == 'spiroAnimate'){return;}
             }
 
             function render( delta )

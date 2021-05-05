@@ -15,7 +15,7 @@ const makeGUI = ()=>{
         updateOctave(val);
         moveKeyLabels();
     });
-    var vis = gui.add(controls, 'visualize',{'Tonnetz Grid':'tonnetz','Spirograph':'spiro', '3D Spirograph': 'spiro3D'}).name('Visualization');
+    var vis = gui.add(controls, 'visualize',{'Tonnetz Grid':'tonnetz','Spirograph':'spiro','SpiroAnimate':'spiroAnimate', '3D Spirograph': 'spiro3D'}).name('Visualization');
     vis.onChange(function(val)
         {
             for (let l of scene.lineList){
@@ -36,6 +36,10 @@ const makeGUI = ()=>{
                     console.log('spirograph');
                     scene.spiro.visible = true;
                     break;
+                case 'spiroAnimate':
+                    console.log('spiroAnimate');
+                    scene.spiro.visible = true;
+                    break;
                 case 'spiro3D':
                     console.log("spiro3D");
                     scene.spiro3D.visible = true;
@@ -45,9 +49,10 @@ const makeGUI = ()=>{
     keyColors.open();
     var noteOnColorControl = keyColors.addColor(controls, 'monochrome').name('Monochrome');
     noteOnColorControl.onChange(function(value)
-                    {
-                        noteOnColor.color = new THREE.Color().setRGB(controls.monochrome[0]/256.0, controls.monochrome[1]/256.0, controls.monochrome[2]/256.0);
-                        //console.log(noteOnColor);
+                    {   
+                        let color = parseInt(value.substring(1),16);
+                        noteOnColor.color = new THREE.Color(color);
+                        //console.log(value, controls.monochrome, color);
                         for (let k of keys_obj[0].children){
                             //console.log(k);
                             if (k.name.charAt(0)=='_') k.material.note_on = noteToColor(parseInt(k.name.slice(1))).color;

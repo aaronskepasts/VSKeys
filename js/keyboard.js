@@ -151,6 +151,9 @@ function key_status (keyName, status)
             if (controls.visualize == 'spiro'){
                 updateSpiro(scene, note, true, 2);
             }
+            if (controls.visualize == 'spiroAnimate'){
+                updateSpiro(scene, note, true, 2.5);
+            }
             if (controls.visualize == 'spiro3D'){
                 updateSpiro(scene, note, true, 3);
             }
@@ -172,6 +175,9 @@ function key_status (keyName, status)
             }
             if (controls.visualize == 'spiro'){
                 updateSpiro(scene, note, false, 2);
+            }
+            if (controls.visualize == 'spiroAnimate'){
+                updateSpiro(scene, note, false, 2.5);
             }
             if (controls.visualize == 'spiro3D'){
                 updateSpiro(scene, note, false, 3);
@@ -246,7 +252,6 @@ function update_key( obj, delta ){
     {
         //console.log('updating');
         obj.rotation.x = mix(-controls.key_max_rotation, -Math.PI/4.0, smoothstep(0.0, 1.0, controls.key_attack_time*obj.clock.getElapsedTime()));
-
         if (obj.rotation.x <= -Math.PI/4.0)
         {
             //console.log('deactivate');

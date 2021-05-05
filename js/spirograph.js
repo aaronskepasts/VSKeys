@@ -14,18 +14,18 @@ function addSpirograph(scene, color){
       map: texture,
     });
     let graph = new THREE.Mesh(geometry, material);
+    graph.ctx = ctx;
     graph.material.side = THREE.DoubleSide;
     graph.visible = false;
     graph.dir = 'pos';
     graph.customStr = '';
     graph.customSign = [];
+    graph.clock = new THREE.Clock(false);
+
     scene.spiro = graph;
-    graph.txtr = texture;
-    texture.ctx = ctx;
     graph.position.fromArray([6,-0.4,-5]);
     graph.rotateX(-Math.PI/2);
     scene.add(graph);
-
 
     // 3D line
     // let mat = new THREE.LineBasicMaterial({color: 0x0000ff,linewidth: 1});
@@ -63,7 +63,14 @@ function updateSpiro(scene, pitch, on, dim){
   //if (pitches.length>0){
   if (dim == 2){
     drawGraph(pitches);
-    scene.spiro.txtr.needsUpdate = true;
+    scene.spiro.material.map.needsUpdate = true;
+  }
+  if (dim == 2.5){
+    console.log(scene.spiro.clock.getElapsedTime());
+    scene.spiro.ctx.fillRect(0, 0, scene.spiro.ctx.canvas.width, scene.spiro.ctx.canvas.height);
+    scene.spiro.clock.start();
+    scene.spiro.clock.elapsedTime = 0;
+    scene.spiro.material.map.needsUpdate = true;
   }
   if (dim == 3){
     scene.spiro3D.geometry.dispose();
@@ -73,7 +80,7 @@ function updateSpiro(scene, pitch, on, dim){
 }
 
 function drawGraph(notes){
-  let ctx = scene.spiro.txtr.ctx;
+  let ctx = scene.spiro.ctx;
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   if (notes.length == 0) return;
 
@@ -159,4 +166,49 @@ function draw3DGraph(notes){
   }
   scene.spiro3D.geometry = new THREE.BufferGeometry().setFromPoints( points );
   scene.spiro3D.material = new THREE.PointsMaterial({ color: '#'+noteToColor(min).color.getHexString(), size: 0.1 });
+}
+
+function animateSpiro(notes){
+  let ctx = scene.spiro.ctx;
+  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  if (notes.length == 0) return;
+
+  let signArr = scene.spiro.customSign;
+  let alt = scene.spiro.dir == 'alt';
+  let custom = scene.spiro.dir == 'custom';
+  //console.log(signArr);
+  //console.log(ctx);
+  notes.sort(function(a,b){return a - b});
+  let min = notes[0];
+  ctx.strokeStyle = '#'+noteToColor(min).color.getHexString();
+  notes = notes.map(function(val){return val - min;});
+  let freq = [];
+  let freqSum = 0;
+  for (let n of notes){
+    let f = notesToRatios[n%12]*Math.pow(2,Math.floor(n/12));
+    freqSum+=1/f;
+    freq.push(f);
+  }
+  //console.log(freqSum);
+  const center = ctx.canvas.height/2;
+  const scale = center/(freqSum);
+  ctx.moveTo(center+freqSum, center);
+  ctx.beginPath();
+  for (let t = 0; t<Math.PI*96; t+=0.125){
+    let x = center;
+    let y = center;
+    for (let i = 0; i<freq.length; i++){
+      r = freq[i];
+      let sign = 1;
+      if (custom && i<signArr.length) sign = signArr[i];
+      if (alt) sign = i%2 == 0 ? 1: -1;
+      x+=scale*Math.sin(r*t*sign)/r;
+      y+=scale*Math.cos(r*t*sign)/r;
+    }
+    ctx.lineTo(x,y);
+  }
+  //console.log('drawn');
+  //ctx.lineTo(250, 140);
+  ctx.closePath();
+  ctx.stroke();
 }
