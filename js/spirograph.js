@@ -4,11 +4,11 @@ function addSpirograph(scene, color){
     ctx.canvas.width = 2048;
     ctx.canvas.height = 2048;
     ctx.fillStyle = ConvertHexToString(color);
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height); 
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     const texture = new THREE.CanvasTexture(ctx.canvas);
     texture.wrapS = THREE.MirroredRepeatWrapping;
     //console.log(texture);
-    
+
     const geometry = new THREE.PlaneGeometry( 9, 8, 2);
     const material = new THREE.MeshBasicMaterial({
       map: texture,
@@ -26,14 +26,22 @@ function addSpirograph(scene, color){
     graph.rotateX(-Math.PI/2);
     scene.add(graph);
 
-    let mat = new THREE.LineBasicMaterial({color: 0x0000ff,linewidth: 1});
+
+    // 3D line
+    // let mat = new THREE.LineBasicMaterial({color: 0x0000ff,linewidth: 1});
     let geo = new THREE.BufferGeometry();
-  
-    var line = new THREE.Line( geo, mat );
-    line.visible = false;
-    scene.spiro3D = line;
-    scene.add(line);
-    scene.counter = 0;
+
+    // var line = new THREE.Line( geo, mat );
+    // line.visible = false;
+    // scene.spiro3D = line;
+    // scene.add(line);
+
+    const pMat = new THREE.PointsMaterial({ color: color, size: 0.1 });
+    var particles = new THREE.Points(geo, pMat);
+    particles.visible = false;
+    scene.spiro3D = particles;
+    scene.spiro3D.color = color;
+    scene.add(particles);
 
     scene.pitches = {};
     //drawGraph([0,4,7]);
@@ -63,10 +71,10 @@ function updateSpiro(scene, pitch, on, dim){
     else scene.spiro3D.geometry = new THREE.BufferGeometry();
   }
 }
-  
+
 function drawGraph(notes){
   let ctx = scene.spiro.txtr.ctx;
-  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height); 
+  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   if (notes.length == 0) return;
 
   let signArr = scene.spiro.customSign;
@@ -150,4 +158,5 @@ function draw3DGraph(notes){
     points.push( new THREE.Vector3( x, y,z ) );
   }
   scene.spiro3D.geometry = new THREE.BufferGeometry().setFromPoints( points );
+  scene.spiro3D.material = new THREE.PointsMaterial({ color: '#'+noteToColor(min).color.getHexString(), size: 0.1 });
 }
