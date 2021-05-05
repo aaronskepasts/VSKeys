@@ -154,7 +154,7 @@
 
             document.body.appendChild(renderer.domElement);
 
-            var material = new THREE.MeshLambertMaterial( { color: 0x606060} )
+            var material = new THREE.MeshLambertMaterial( { color: 0x555555} )
 
             let floor = new THREE.Mesh( new THREE.PlaneGeometry( 8000, 8000 ), new THREE.MeshBasicMaterial( { color: controls.floorColor } ) );
             floor.rotation.x = - 90 * ( Math.PI / 180 );
@@ -162,7 +162,7 @@
             floor.receiveShadow = true;
             floor.castShadow = true;
             scene.add( floor );
-            scene.fog = new THREE.Fog( 0xffffff, 40, 50 );
+            scene.fog = new THREE.Fog( 0x000000, 40, 50 );
 
             init_lights();
             var loader = new ColladaLoader();
@@ -173,7 +173,7 @@
             camera.position.y = 6.51;
 
             var cameraControls = new THREE.OrbitAndPanControls(camera, renderer.domElement);
-            cameraControls.target.set(6,0,-2);
+            cameraControls.target.set(6,1.5,-2);
 
             var clock = new THREE.Clock();
             //console.log(keys_obj);
@@ -227,7 +227,7 @@
                 collada.scene.traverse(initialize_keys);
                 scene.add(collada.scene);
                 var skyGeo = new THREE.SphereGeometry(100, 25, 25);
-                var material = new THREE.MeshPhongMaterial({ color: 0xffffff});
+                var material = new THREE.MeshPhongMaterial({ color: 0x555555});
                 var sky = new THREE.Mesh(skyGeo, material);
                 sky.material.side = THREE.BackSide;
                 scene.add(sky);
@@ -344,7 +344,10 @@
                                     "Polonaise Ab major, Opus 53, Chopin": "chpn_op53.mid",
                                     "No. 2 - Oriental, Granados": "gra_esp_2.mid",
                                     "Bohemian Rhapsody, Queen": "bohemian1.mid",
-                                    "P 1": "P3.mid"
+                                    "Autumn Leaves w/ Bass": "Autumn_Leaves_Chords.mid",
+                                    "Autumn Leaves": "AutumnLeavesChords.mid",
+                                    "Aaron Beat Draft": "Final_Beat_Draft.mid",
+                                    "Aaron A Foggy Day": "Aaron_Foggy_Day.mid"
                                   };
                     makeGUI();
                     var tour = loadTour();
