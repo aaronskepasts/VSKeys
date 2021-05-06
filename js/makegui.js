@@ -26,25 +26,29 @@ const makeGUI = ()=>{
             }
             scene.spiro.visible = false;
             scene.spiro3D.visible = false;
-            scene.floor.visible = true;
+            scene.floor.visible = false;
             switch (val){
                 case 'tonnetz':
                     for (let s of scene.sphereList){
                         s.visible = true;
                     }
+                    scene.floor.visible = true;
                     break;
                 case 'spiro':
                     console.log('spirograph');
                     scene.spiro.visible = true;
+                    //scene.spiro.ctx.fillStyle = '#000000';
+                    //scene.spiro.ctx.fillRect(0, 0, scene.spiro.ctx.canvas.width, scene.spiro.ctx.canvas.height);
                     break;
                 case 'spiroAnimate':
                     console.log('spiroAnimate');
                     scene.spiro.visible = true;
+                    //scene.spiro.ctx.fillStyle = '#'+scene.floor.material.color.getHexString();
+                    //scene.spiro.ctx.fillRect(0, 0, scene.spiro.ctx.canvas.width, scene.spiro.ctx.canvas.height);
                     break;
                 case 'spiro3D':
                     console.log("spiro3D");
                     scene.spiro3D.visible = true;
-                    scene.floor.visible = false;
             }
         });
     var keyColors = gui.addFolder('Key Colors');
@@ -52,9 +56,12 @@ const makeGUI = ()=>{
     var noteOnColorControl = keyColors.addColor(controls, 'monochrome').name('Monochrome');
     noteOnColorControl.onChange(function(value)
                     {
-                        let color = parseInt(value.substring(1),16);
-                        noteOnColor.color = new THREE.Color(color);
-                        //console.log(value, controls.monochrome, color);
+                        //console.log(value);
+                        if (value.length == 4){
+                            noteOnColor.color.setRGB(value[0]/256.0, value[1]/256.0, value[2]/256.0);
+                        } else{
+                            noteOnColor.color.setHex(parseInt(value.substring(1),16));
+                        }
                         for (let k of keys_obj[0].children){
                             //console.log(k);
                             if (k.name.charAt(0)=='_') k.material.note_on = noteToColor(parseInt(k.name.slice(1))).color;

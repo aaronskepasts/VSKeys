@@ -17,6 +17,9 @@
         <!--Shepherd-->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shepherd.js/8.0.0/css/shepherd.css" integrity="sha512-sc/EXnTEcinxW2Pq4YgmUhkkUwQi9SaEVWa7uFbuRNd+pVxZQFJemkfEcy7je31+rY3rgR3Tf0x3C2lmwlylYg==" crossorigin="anonymous" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/shepherd.js/8.0.0/js/shepherd.min.js" integrity="sha512-g6UoKc+cPrVq13/iMhDdv+shNha5ZZ9HeEc+qPK7zFulktsi82ajrlXt14o6qFGG504f5U3+B16JtwGIAUAgfQ==" crossorigin="anonymous"></script>
+
+        <script src="https://cdn.rawgit.com/mrdoob/three.js/master/examples/js/loaders/GLTFLoader.js"></script>
+
         <!-- extras -->
         <script src="js/base64binary.js" type="text/javascript"></script>
         <script src="js/keyboard.js" type="text/javascript"></script>
@@ -24,7 +27,6 @@
         <script src="js/tonnetz.js" type="text/javascript"></script>
         <script src="js/makegui.js" type="text/javascript"></script>
         <script src="js/spirograph.js" type="text/javascript"></script>
-        <script src="js/spirograph3D.js" type="text/javascript"></script>
         <script src="js/tour.js" type="text/javascript"></script>
 
         <script src="js/MIDI/AudioDetect.js" type="text/javascript"></script>
@@ -99,6 +101,7 @@
                 this.song = "Roundmidnight.mid";
                 this.key_color_scheme = 'monochrome';
                 this.monochrome = [ 128, 0, 255, 1.0 ];
+                //this.monochrome = [ 255, 255, 255, 1.0 ];
                 this.gui;
                 this.visualize = 'tonnetz';
                 this.scale3D = 1;
@@ -130,6 +133,8 @@
             for (let i = 0; i<colors.length; i++){
                 colors[i] = new THREE.MeshPhongMaterial( {color: colors[i]} );
             }
+            const black = new THREE.Color(0x000000);
+            var up = new THREE.Vector3(0,1,0);
             //console.log(colors);
             const noteToColor = (a) => {
                 switch (controls.key_color_scheme){
@@ -182,6 +187,15 @@
             cameraControls.target.set(6,1.5,-2);
 
             var clock = new THREE.Clock();
+            /*
+            const topLoader = new THREE.GLTFLoader();
+            topLoader.load( 'top/spinningTop.gltf', function ( gltf ) {
+                //console.log(gltf);
+                scene.add( gltf.scene );
+            }, undefined, function ( error ) {
+                console.error( error );
+            } );
+            */
             //console.log(keys_obj);
 
             function on_window_resize()
@@ -252,15 +266,18 @@
 
             function update( delta )
             {
-              cameraControls.update(delta);
-              for(i in keys_obj)
-              {
-                  update_key(keys_obj[i], delta);
-              }
-              if (controls.visualize == 'tonnetz'){
-                animateTonnetz(scene);
-              }
-              if (controls.visualize == 'spiroAnimate'){return;}
+                cameraControls.update(delta);
+                for(i in keys_obj)
+                {
+                    update_key(keys_obj[i], delta);
+                }
+                if (controls.visualize == 'tonnetz'){
+                    animateTonnetz(scene);
+                }
+                if (controls.visualize == 'spiroAnimate' && scene.spiro.freqSum>0){
+                    //console.log(delta);
+                    animateSpiro(delta);
+                }
             }
 
             function render( delta )
@@ -328,7 +345,8 @@
 
                     // Close the MIDI loader widget and open the GUI
                     MIDI.loader.stop();
-                    songsToFiles ={"Round Midnight, Thelonious Monk": "Roundmidnight.mid",
+                    songsToFiles ={'Lush Life':'lush_life.mid',
+                        "Round Midnight, Thelonious Monk": "Roundmidnight.mid",
                                     "Game Of Thrones Theme, Ramin Djawadi": "game_of_thrones.mid",
                                     "Mario Overworld Theme (Super Mario Bros 3), Koji Kondo": "mario_-_overworld_theme.mid",
                                     "He's a Pirate (Pirates of the Caribbean), Klaus Badelt" : "hes_a_pirate.mid",

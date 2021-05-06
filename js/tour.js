@@ -41,12 +41,12 @@ function loadTour(){
 }
 function getGuiElements(){
   let gui = Array.from(document.getElementsByTagName('li'));
-  console.log(gui.length);
+  //console.log(gui.length);
   gui = gui.filter((val)=>{
     //console.log(val.className, val.className!='folder', val.className!='title');
     return val.className!='folder';
   });
-  console.log(gui.length);
+  //console.log(gui.length);
   let idList = ['instrument','orbit','controls','octave','vis_type',
     'key_color','monochrome','color_scheme','spiro_settings',//'spiro_type',
     'spiro_sign','custom_spiro_sign','midi','play']
