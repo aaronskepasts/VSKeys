@@ -5,7 +5,7 @@
         integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ=="
         crossorigin="anonymous"></script>
 <!--script src="js/THREE.MeshLine.js"></script-->
-        <!--script src="js/three.js"></script-->
+        <!--script src="js/three.js"></script-->y
         <script src="js/TGALoader.js"></script>
         <script src="js/NewColladaLoader.js"></script>
         <script src="js/OrbitAndPanControls.js"></script>
@@ -98,7 +98,7 @@
                 this.key_max_rotation = 0.72;
                 this.octave = 1;
                 this.instrument = 'AMSynth';
-                this.song = "Roundmidnight.mid";
+                this.song = "mond_1.mid";
                 this.key_color_scheme = 'monochrome';
                 this.monochrome = [ 128, 0, 255, 1.0 ];
                 //this.monochrome = [ 255, 255, 255, 1.0 ];
@@ -111,6 +111,7 @@
                 this.orbit=false;
                 this.floorColor = 0xf0eff0;
                 this.sphereJump = 4;
+                this.spiroSpeed = 1;
                 this.play = function()
                     {
                         MIDI.Player.resume();
@@ -133,6 +134,8 @@
             for (let i = 0; i<colors.length; i++){
                 colors[i] = new THREE.MeshPhongMaterial( {color: colors[i]} );
             }
+            var whiteText = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+            var blackText = new THREE.MeshPhongMaterial( {color: 0x000000} );
             const black = new THREE.Color(0x000000);
             var up = new THREE.Vector3(0,1,0);
             //console.log(colors);
@@ -345,21 +348,22 @@
 
                     // Close the MIDI loader widget and open the GUI
                     MIDI.loader.stop();
-                    songsToFiles ={'Lush Life':'lush_life.mid',
-                        "Round Midnight, Thelonious Monk": "Roundmidnight.mid",
+                    songsToFiles ={//'Lush Life':'lush_life.mid',
+                        //"Round Midnight, Thelonious Monk": "Roundmidnight.mid",
+                                    "Moonlight Sonata, Beethoven": "mond_1.mid",
+                                    //"Body and Soul, John Green": "body_and_soul_oz.mid",
+                                    "For Elise, Beethoven": "for_elise_by_beethoven.mid",
+                                    "Prelude and Fugue in C major BWV 846, Bach": "bach_846.mid",
                                     "Game Of Thrones Theme, Ramin Djawadi": "game_of_thrones.mid",
                                     "Mario Overworld Theme (Super Mario Bros 3), Koji Kondo": "mario_-_overworld_theme.mid",
                                     "He's a Pirate (Pirates of the Caribbean), Klaus Badelt" : "hes_a_pirate.mid",
                                     "Hedwigs Theme (Harry Potter), John Williams": "hedwigs_theme.mid",
-                                    "Something There (Beauty and the Beast), Alan Menken":"something_there.mid",
-                                    "Cruel Angel Thesis (Neon Genesis Evangelion)": "cruel_angel__s_thesis.mid",
-                                    "Me cuesta tanto olvidarte (Mecano)": "me_cuesta.mid",
-                                    "Sonata No. 14 C# minor (Moonlight), Beethoven": "mond_1.mid",
-                                    "For Elise, Beethoven": "for_elise_by_beethoven.mid",
-                                    "Asturias (Leyenda), Albeniz": "alb_se5_format0.mid",
-                                    "Aragon (Fantasia), Albeniz": "alb_se6.mid",
-                                    "Prelude and Fugue in C major BWV 846, Bach": "bach_846.mid",
-                                    "Fantasia C major, Schubert": "schub_d760_1.mid",
+                                    //"Something There (Beauty and the Beast), Alan Menken":"something_there.mid",
+                                    //"Cruel Angel Thesis (Neon Genesis Evangelion)": "cruel_angel__s_thesis.mid",
+                                    //"Me cuesta tanto olvidarte (Mecano)": "me_cuesta.mid",
+                                    //"Asturias (Leyenda), Albeniz": "alb_se5_format0.mid",
+                                    //"Aragon (Fantasia), Albeniz": "alb_se6.mid",
+                                    //"Fantasia C major, Schubert": "schub_d760_1.mid",
                                     "Sonata No. 16 C major, Mozart": "mz_545_1.mid",
                                     "Sonata No. 11 A major (K331, First Movement), Mozart": "mz_331_1.mid",
                                     "March - Song of the Lark, Tchaikovsky":"ty_maerz.mid",

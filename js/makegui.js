@@ -5,11 +5,11 @@ const makeGUI = ()=>{
     //gui.add(controls, 'key_max_rotation',0.2 , 1.0);
 
     // make sure to remove any key pressed when changing the octave
-    gui.add(controls, 'instrument',{"Piano":'piano','AMSynth':'AMSynth'}).name('Instrument');
+    gui.add(controls, 'instrument',{'Synth':'AMSynth',"Piano":'piano'}).name('Instrument');
     let orbit = gui.add(controls, 'orbit').name('Orbit');
     orbit.onChange((val)=>{cameraControls.autoRotate = val});
     //gui.add(controls, 'key_attack_time',1, 10).step(1);
-    gui.add(controls, 'tutorial').name('Show Controls').onChange(moveKeyLabels);
+    gui.add(controls, 'tutorial').name('Show Key Layout').onChange(moveKeyLabels);
     var octave = gui.add(controls, 'octave',0 , 3).step(1).name('Octave');
     octave.onChange((val)=>{
         updateOctave(val);
@@ -25,20 +25,20 @@ const makeGUI = ()=>{
                 s.visible = false;
             }
             scene.spiro.visible = false;
+            scene.remove(scene.spiro.arrows);
             scene.spiro3D.visible = false;
-            scene.floor.visible = false;
+            scene.floor.visible = true;
+            scene.spiro.ctx.fillRect(0, 0, scene.spiro.ctx.canvas.width, scene.spiro.ctx.canvas.height);
             switch (val){
                 case 'tonnetz':
                     for (let s of scene.sphereList){
                         s.visible = true;
                     }
-                    scene.floor.visible = true;
                     break;
                 case 'spiro':
                     console.log('spirograph');
                     scene.spiro.visible = true;
                     //scene.spiro.ctx.fillStyle = '#000000';
-                    //scene.spiro.ctx.fillRect(0, 0, scene.spiro.ctx.canvas.width, scene.spiro.ctx.canvas.height);
                     break;
                 case 'spiroAnimate':
                     console.log('spiroAnimate');
@@ -49,7 +49,9 @@ const makeGUI = ()=>{
                 case 'spiro3D':
                     console.log("spiro3D");
                     scene.spiro3D.visible = true;
+                    scene.floor.visible = false;
             }
+            moveKeyLabels();
         });
     var keyColors = gui.addFolder('Key Colors');
     keyColors.open();
@@ -94,14 +96,12 @@ const makeGUI = ()=>{
             }
             if (c == '+') signArr.push(1);
             if (c == '-') signArr.push(-1);
-        }
+        }{}
         scene.spiro.customSign = signArr;
     });
 
-    var scale3D = visFolder.add(controls, 'scale3D', 0.1, 3).step(0.01).name('Scale');
-    scale3D.onChange((val)=>{
-        scene.spiro3D.scale.fromArray([val, val, val]);
-    });
+    visFolder.add(controls, 'spiroSpeed', 1, 5).step(0.1).name('Animation Speed');
+    /*
     var rotateX = visFolder.add(controls, 'rotateX', -Math.PI, Math.PI).step(0.1).name('Rotate X');
     rotateX.initialValue = 0;
     rotateX.onChange((val)=>{
@@ -116,7 +116,7 @@ const makeGUI = ()=>{
     rotateZ.initialValue = 0;
     rotateZ.onChange((val)=>{
         scene.spiro3D.rotation.fromArray([scene.spiro3D.rotation.x, scene.spiro3D.rotation.y, val]);
-    });
+    });*/
     var midiFolder = gui.addFolder('Player Piano');
     midiFolder.open()
     var song = midiFolder.add(controls, 'song', songsToFiles).name('Song');

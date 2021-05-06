@@ -43,6 +43,7 @@ function initialize_tutorial (scene){
         for (let i = 0; i<white_keys.length; i++){
             var geometry = new THREE.TextGeometry( white_keys[i], textSettings);
             var mesh = new THREE.Mesh( geometry, textMat );
+            mesh.black = false;
             mesh.scale.fromArray([0.1,0.1,0.1]);
             mesh.rotation.fromArray([-Math.PI/2,0,0]);
             mesh.position.fromArray([2.22+key_offset*i,-0.31,1.2]);
@@ -67,6 +68,7 @@ function initialize_tutorial (scene){
             if(!black_keys[i]){continue;}
             var geometry = new THREE.TextGeometry( black_keys[i], textSettings);
             var mesh = new THREE.Mesh( geometry, textMat );
+            mesh.black = true;
             mesh.scale.fromArray([0.1,0.1,0.1]);
             mesh.rotation.fromArray([-Math.PI/2,0,0]);
             mesh.position.fromArray([2.2+key_offset*i,-0.125,-0.6]);
@@ -78,6 +80,7 @@ function initialize_tutorial (scene){
         }
         geometry = new THREE.TextGeometry( 'Toggle Octave: CapsLock', textSettings);
         mesh = new THREE.Mesh( geometry, textMat );
+        mesh.black = true;
         mesh.scale.fromArray([0.1,0.1,0.1]);
         mesh.rotation.fromArray([-Math.PI/2,0,0]);
         mesh.position.fromArray([4.4,-0.4,1.75]);
@@ -90,7 +93,15 @@ function initialize_tutorial (scene){
 function moveKeyLabels(){
     let h = scene.keyLabels.hideable;
     if (controls.tutorial){
-        for (let key of scene.keyLabels.children){key.visible = true;}
+        for (let key of scene.keyLabels.children){
+            //console.log(key.black, scene.floor.visible);
+            if (key.black && !scene.floor.visible){
+                key.material = whiteText;
+                //console.log("blackKey");
+            } else 
+                key.material = blackText;
+            key.visible = true;
+        }
         if (controls.octave == 3){
             //console.log(h);
             for (let key of h){key.visible = false;}
@@ -257,8 +268,9 @@ function update_key( obj, delta ){
             //console.log('deactivate');
             obj.keyState = keyState.unpressed;
             obj.clock.elapsedTime = 0;
-            AMSynth.triggerRelease(intToLetterName(parseInt(obj.name.substring(1))+12));
-            piano.triggerRelease(intToLetterName(parseInt(obj.name.substring(1))));
+            let note = parseInt(obj.name.substring(1));
+            AMSynth.triggerRelease(intToLetterName(note+12));
+            piano.triggerRelease(intToLetterName(note));
         }
     }
 }

@@ -3,7 +3,7 @@ function addSpirograph(scene, color){
     const ctx = document.createElement('canvas').getContext('2d');
     ctx.canvas.width = 2048;
     ctx.canvas.height = 2048;
-    ctx.fillStyle = '#000000';
+    ctx.fillStyle = ConvertHexToString(controls.floorColor);
     ctx.lineWidth = 2;
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     const texture = new THREE.CanvasTexture(ctx.canvas);
@@ -69,7 +69,7 @@ function updateSpiro(scene, pitch, on, dim){
     pitches.sort(function(a,b){return a - b});
     min = pitches[0];
     pitches = pitches.map(function(val){return val - min;});
-    s.ctx.color = noteToColor(min).color.clone();
+    s.ctx.color = noteToColor(pitches[pitches.length - 1]+min).color.clone();
     s.ctx.palette = s.ctx.color.clone();
     s.ctx.strokeStyle = '#'+s.ctx.color.getHexString();
     scene.spiro3D.material.color = noteToColor(min).color;
@@ -166,6 +166,7 @@ function drawGraph(notes){
   //ctx.closePath();
   ctx.stroke();
 }
+
 function ConvertHexToString(str) {
   //console.log(str.toString(16));
   let hex = '#'+str.toString(16);
@@ -229,7 +230,7 @@ function animateSpiro(delta){
   const originalColor = ctx.strokeStyle;
   const col = ctx.color;
   
-  let end = scene.spiro.clock.getElapsedTime();
+  let end = scene.spiro.clock.getElapsedTime()*controls.spiroSpeed;
   let start = Math.max(0,end-tailLength);
   let increment = Math.min(end/32,0.125);
   
@@ -247,7 +248,13 @@ function animateSpiro(delta){
     return [x,y];
   }
 
+  ctx.strokeStyle = '#000000';
   ctx.beginPath();
+  for (let t = 0; t<start; t+=increment){
+    let [x,y] = para(t);
+    ctx.lineTo(x,y);
+  }
+  ctx.stroke();
   for (let t = start; t<end; t+=increment){
     let [x,y] = para(t);
     ctx.lineTo(x,y);
@@ -280,7 +287,7 @@ function animateArrows(delta, freq, alt, custom, signArr){
     if (custom && i<signArr.length) sign = signArr[i];
     if (alt) sign = i%2 == 0 ? 1: -1;
 
-    a.dir.applyAxisAngle(up, sign*delta*freq[i]);
+    a.dir.applyAxisAngle(up, controls.spiroSpeed*sign*delta*freq[i]);
     a.setDirection(a.dir);
     if (i > 0) {
       a.position.copy(prevEnd);
