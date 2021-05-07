@@ -64,7 +64,49 @@ const makeGUI = ()=>{
         scene.spiro.customSign = signArr;
     });
 
+<<<<<<< Updated upstream
     visFolder.add(controls, 'spiroSpeed', 1, 5).step(0.1).name('Drawing Speed');
+=======
+    visFolder.add(controls, 'spiroSpeed', 1, 5).step(0.1).name('Animation Speed');
+
+    var spiro3DFolder = gui.addFolder('3D Spirograph Settings');
+    spiro3DFolder.open()
+    var scale3D = spiro3DFolder.add(controls, 'scale3D', 0.1, 3).step(0.01).name('Scale');
+    scale3D.onChange((val)=>{
+        console.log(scale3D);
+        scene.spiro3D.scale.fromArray([val, val, val]);
+    });
+    let animateS = spiro3DFolder.add(controls, 'animateS').name('Animate Scale');
+    animateS.onChange((val)=>{
+            if (!val){
+              scene.spiro3D.scale.fromArray([1,1,1]);
+            }
+            scene.spiro3D.s = [0.3, 0.3, 0.3]
+    });
+    let animateP = spiro3DFolder.add(controls, 'animateP').name('Animate Particles');
+    animateP.onChange((val)=>{
+            if (scene.spiro3D.geometry.index != null){
+              console.log("w");
+              scene.spiro3D.geometry.dispose();
+            }
+    });
+    /*
+    var rotateX = visFolder.add(controls, 'rotateX', -Math.PI, Math.PI).step(0.1).name('Rotate X');
+    rotateX.initialValue = 0;
+    rotateX.onChange((val)=>{
+        scene.spiro3D.rotation.fromArray([val, scene.spiro3D.rotation.y, scene.spiro3D.rotation.z]);
+    });
+    var rotateY = visFolder.add(controls, 'rotateY', -Math.PI, Math.PI).step(0.01).name('Rotate Y');
+    rotateY.initialValue = 0;
+    rotateY.onChange((val)=>{
+        scene.spiro3D.rotation.fromArray([scene.spiro3D.rotation.x, val, scene.spiro3D.rotation.z]);
+    });
+    var rotateZ = visFolder.add(controls, 'rotateZ', -Math.PI, Math.PI).step(0.01).name('Rotate Z');
+    rotateZ.initialValue = 0;
+    rotateZ.onChange((val)=>{
+        scene.spiro3D.rotation.fromArray([scene.spiro3D.rotation.x, scene.spiro3D.rotation.y, val]);
+    });*/
+>>>>>>> Stashed changes
     var midiFolder = gui.addFolder('Player Piano');
     midiFolder.open()
     var song = midiFolder.add(controls, 'song', songsToFiles).name('Song');

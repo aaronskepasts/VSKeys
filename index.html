@@ -129,6 +129,8 @@
                 this.rotateX = 0;
                 this.rotateY = 0;
                 this.rotateZ = 0;
+                this.animateS = false;
+                this.animateP = false;
                 this.orbit=false;
                 this.floorColor = 0xf0eff0;
                 this.sphereJump = 4;
@@ -302,10 +304,19 @@
                     //console.log(delta);
                     animateSpiro(delta);
                 }
+                if (controls.animateS){
+                  animateScale(delta);
+                  // console.log(delta);
+                }
+                if (controls.animateP){
+                  animateParticles(delta);
+                  // console.log(delta);
+                }
             }
 
             function render( delta )
             {
+
                 renderer.render(scene, camera);
             };
 

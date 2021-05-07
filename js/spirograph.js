@@ -38,12 +38,16 @@ function addSpirograph(scene, color){
     // scene.spiro3D = line;
     // scene.add(line);
 
-    const pMat = new THREE.PointsMaterial({ color: color, size: 0.1 });
+    const pMat = new THREE.PointsMaterial({ color: color, size: 0.12 });
     var particles = new THREE.Points(geo, pMat);
     particles.visible = false;
-    particles.position.fromArray([6, 2, -5]);
+    particles.position.fromArray([6, 1, -15]);
     scene.spiro3D = particles;
     scene.spiro3D.color = color;
+    // set animation of spiro3D
+    scene.spiro3D.t = 0.005;
+    scene.spiro3D.s = [0.3, 0.3, 0.3];
+    scene.spiro3D.shrink = false;
 
     scene.add(particles);
 
@@ -98,7 +102,7 @@ function updateSpiro(scene, pitch, on, dim){
     s.clock.start();
     s.clock.elapsedTime = 0;
     s.material.map.needsUpdate = true;
-    
+
     //console.log(freq, freqSum);
     scene.remove(s.arrows);
     s.arrows = new THREE.Group();
@@ -116,7 +120,7 @@ function updateSpiro(scene, pitch, on, dim){
         arrow.dir = dir;
         arrow.len = arrow_length;
         s.arrows.add(arrow);
-        
+
         root = root.clone().addScaledVector(dir,arrow_length);
       }
       scene.add(s.arrows);
@@ -125,7 +129,11 @@ function updateSpiro(scene, pitch, on, dim){
   if (dim == 3){
     scene.spiro3D.geometry.dispose();
     if (pitches.length>0) draw3DGraph(pitches);
-    else scene.spiro3D.geometry = new THREE.BufferGeometry();
+    else {
+      scene.spiro3D.geometry = new THREE.BufferGeometry();
+      scene.spiro3D.freq = undefined;
+      scene.spiro3D.freqSum = 0;
+    }
   }
 }
 
@@ -191,9 +199,10 @@ function draw3DGraph(notes){
     freqSum+=1/f;
     freq.push(f);
   }
-
-  const scale = 2/(freqSum);
-  let z = -Math.PI*1200/0.125*0.0001/2;
+  scene.spiro3D.freq = freq;
+  scene.spiro3D.freqSum = freqSum;
+  const scale = 4.5/(freqSum);
+  let z = 0;
   for (let t = 0; t<Math.PI*1200; t+=0.125){
     let x = 0;
     let y = 0;
@@ -205,7 +214,7 @@ function draw3DGraph(notes){
       x+=scale*Math.sin(r*t*sign)/r;
       y+=scale*Math.cos(r*t*sign)/r;
     }
-    z += 0.0001;
+    z += 0.00035;
     points.push( new THREE.Vector3( x, y,z ) );
   }
   scene.spiro3D.geometry = new THREE.BufferGeometry().setFromPoints( points );
@@ -229,11 +238,11 @@ function animateSpiro(delta){
 
   const originalColor = ctx.strokeStyle;
   const col = ctx.color;
-  
+
   let end = scene.spiro.clock.getElapsedTime()*controls.spiroSpeed;
   let start = Math.max(0,end-tailLength);
   let increment = Math.min(end/32,0.125);
-  
+
   const para = (t)=>{
     let x = center;
     let y = center;
@@ -294,5 +303,65 @@ function animateArrows(delta, freq, alt, custom, signArr){
     }
     prevEnd = a.position.clone().addScaledVector(a.dir,a.len);
     //a.rotateY(0.0125);
+  }
+}
+
+function animateScale(delta){
+  let s = scene.spiro3D.scale
+  let scale = scene.spiro3D.s
+  let freq = scene.spiro3D.freq;
+  let f = 1.5
+  s.fromArray(scale)
+  if (freq == undefined){
+    scene.spiro3D.s = [0.3, 0.3, 0.3];
+  } else if (scale[0] < 1.0){
+    for (let i = 0; i < scale.length; i++){
+       scale[i] += delta;
+    }
+  }
+
+
+  // if (s.x < 1.1 && !scene.spiro3D.shrink){
+  //   s.fromArray([s.x+delta*f, s.y+delta*f, s.z+delta*f]);
+  // } else if (s.x > 0.90){
+  //   scene.spiro3D.shrink = true;
+  //   s.fromArray([s.x-delta*f, s.y-delta*f, s.z-delta*f]);
+  // }
+  //
+  // if (s.x <= 0.9) scene.spiro3D.shrink = false;
+}
+
+function animateParticles(delta){
+  // console.log(scene.spiro3D.geometry);
+  let freq = scene.spiro3D.freq;
+  if (freq == undefined){
+    scene.spiro3D.geometry.dispose();
+    return;
+  }
+  let freqSum = scene.spiro3D.freqSum;
+  if (freq.length > 0){
+    let alt = scene.spiro.dir == 'alt';
+    let custom = scene.spiro.dir == 'custom';
+    // store spiro3D points and set start point
+    const points = [];
+    let time = scene.spiro3D.t
+    const scale = 4.5/(freqSum);
+    let z = 0;
+    for (let t = 0+time; t<Math.PI*1200+time; t+=0.125){
+      let x = 0;
+      let y = 0;
+      for (let i = 0; i<freq.length; i++){
+        let r = freq[i];
+        let sign = 1;
+        if (custom && i<signArr.length) sign = signArr[i];
+        if (alt) sign = i%2 == 0 ? 1: -1;
+        x+=scale*Math.sin(r*t*sign)/r;
+        y+=scale*Math.cos(r*t*sign)/r;
+      }
+      z += 0.00035;
+      points.push( new THREE.Vector3( x, y,z ) );
+    }
+    scene.spiro3D.t += 0.005;
+    scene.spiro3D.geometry = new THREE.BufferGeometry().setFromPoints( points );
   }
 }
