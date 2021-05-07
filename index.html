@@ -5,7 +5,7 @@
         integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ=="
         crossorigin="anonymous"></script>
 <!--script src="js/THREE.MeshLine.js"></script-->
-        <!--script src="js/three.js"></script-->y
+        <!--script src="js/three.js"></script-->
         <script src="js/TGALoader.js"></script>
         <script src="js/NewColladaLoader.js"></script>
         <script src="js/OrbitAndPanControls.js"></script>
@@ -79,7 +79,27 @@
                  right: 0px;
                  z-index: -1;
              }
-
+             .shepherd-element {
+                background: #fff;
+                border-radius: 5px;
+                box-shadow: 0 1px 4px rgba(0,0,0,.2);
+                max-width: 600px;
+                opacity: 0;
+                outline: none;
+                transition: opacity .3s,visibility .3s;
+                visibility: hidden;
+                width: 100%;
+                z-index: 9999
+            }
+            .shepherd-title {
+                color: rgba(0,0,0,.75);
+                display: flex;
+                font-size: 1.5rem;
+                font-weight: bold;
+                flex: 1 0 auto;
+                margin: 0;
+                padding: 0;
+            }
         </style>
     </head>
     <body>
@@ -104,6 +124,7 @@
                 //this.monochrome = [ 255, 255, 255, 1.0 ];
                 this.gui;
                 this.visualize = 'tonnetz';
+                this.spiroType = '2D';
                 this.scale3D = 1;
                 this.rotateX = 0;
                 this.rotateY = 0;
@@ -277,7 +298,7 @@
                 if (controls.visualize == 'tonnetz'){
                     animateTonnetz(scene);
                 }
-                if (controls.visualize == 'spiroAnimate' && scene.spiro.freqSum>0){
+                if (controls.visualize == 'spiro' && controls.spiroType=='animate' && scene.spiro.freqSum>0){
                     //console.log(delta);
                     animateSpiro(delta);
                 }
@@ -403,10 +424,10 @@
     }
     </script>
 
-    <div id="info">
-        <a href="http://threejs.org" target="_blank">three.js</a> - 3D Piano player demo<br />
-        Controls: Keyboard to play, Mouse to orbit<br/>
-        Uses <a href="http://mudcu.be/midi-js/" target="_blank">MIDI.js</a> Source code available on <a href="https://github.com/reality3d/3d-piano-player" target="_blank">Github</a><br/>
+    <div id="info" style='color:grey'>
+        Interactive 3D Piano Harmony Visualizer made with <a href="http://threejs.org" target="_blank">three.js</a><br />
+        Uses <a href="http://mudcu.be/midi-js/" target="_blank">MIDI.js</a> and <a href="https://tonejs.github.io/" target="_blank">Tone.js</a>.<br>
+        Codebase adapted from <a href="https://github.com/reality3d/3d-piano-player" target="_blank">3D Piano Player</a> by
         <a href="http://www.twitter.com/reality3d/" target="_blank">Borja Morales</a>
     </div>
 	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>

@@ -1,5 +1,5 @@
 const makeGUI = ()=>{
-    var gui = new dat.GUI({ width:250,hideable: false});
+    var gui = new dat.GUI({ width:300,hideable: false});
     controls.gui = gui;
     //gui.add(controls, 'key_attack_time', 2.0 , 40.0);
     //gui.add(controls, 'key_max_rotation',0.2 , 1.0);
@@ -15,44 +15,7 @@ const makeGUI = ()=>{
         updateOctave(val);
         moveKeyLabels();
     });
-    var vis = gui.add(controls, 'visualize',{'Tonnetz Grid':'tonnetz','Spirograph':'spiro','SpiroAnimate':'spiroAnimate', '3D Spirograph': 'spiro3D'}).name('Visualization');
-    vis.onChange(function(val)
-        {
-            for (let l of scene.lineList){
-                l.visible = false;
-            }
-            for (let s of scene.sphereList){
-                s.visible = false;
-            }
-            scene.spiro.visible = false;
-            scene.remove(scene.spiro.arrows);
-            scene.spiro3D.visible = false;
-            scene.floor.visible = true;
-            scene.spiro.ctx.fillRect(0, 0, scene.spiro.ctx.canvas.width, scene.spiro.ctx.canvas.height);
-            switch (val){
-                case 'tonnetz':
-                    for (let s of scene.sphereList){
-                        s.visible = true;
-                    }
-                    break;
-                case 'spiro':
-                    console.log('spirograph');
-                    scene.spiro.visible = true;
-                    //scene.spiro.ctx.fillStyle = '#000000';
-                    break;
-                case 'spiroAnimate':
-                    console.log('spiroAnimate');
-                    scene.spiro.visible = true;
-                    //scene.spiro.ctx.fillStyle = '#'+scene.floor.material.color.getHexString();
-                    //scene.spiro.ctx.fillRect(0, 0, scene.spiro.ctx.canvas.width, scene.spiro.ctx.canvas.height);
-                    break;
-                case 'spiro3D':
-                    console.log("spiro3D");
-                    scene.spiro3D.visible = true;
-                    scene.floor.visible = false;
-            }
-            moveKeyLabels();
-        });
+    gui.add(controls, 'visualize',{'Tonnetz':'tonnetz','Spirograph':'spiro'}).name('Visualization').onChange(updateVisType);
     var keyColors = gui.addFolder('Key Colors');
     keyColors.open();
     var noteOnColorControl = keyColors.addColor(controls, 'monochrome').name('Monochrome');
@@ -84,8 +47,9 @@ const makeGUI = ()=>{
     // Visualizations
     var visFolder = gui.addFolder('Spirograph Settings');
     visFolder.open();
-    let spiroDir = visFolder.add(scene.spiro,'dir',{'Positive':'pos','Alternating':'alt','Custom':'custom'}).name('Spirograph Sign');
-    visFolder.add(scene.spiro,'customStr').name('Custom Spirograph').onFinishChange((str)=>{
+    visFolder.add(controls,'spiroType',{'2D':'2D','Animated 2D':'animate','3D':'3D'}).name('Type').onChange(updateVisType);
+    let spiroDir = visFolder.add(scene.spiro,'dir',{'Positive':'pos','Alternating':'alt','Custom':'custom'}).name('Rotation Sign');
+    visFolder.add(scene.spiro,'customStr').name('Custom Rotation').onFinishChange((str)=>{
         let signArr = [];
         for (let i = 0; i<str.length; i++){
             let c = str.charAt(i);
@@ -100,23 +64,7 @@ const makeGUI = ()=>{
         scene.spiro.customSign = signArr;
     });
 
-    visFolder.add(controls, 'spiroSpeed', 1, 5).step(0.1).name('Animation Speed');
-    /*
-    var rotateX = visFolder.add(controls, 'rotateX', -Math.PI, Math.PI).step(0.1).name('Rotate X');
-    rotateX.initialValue = 0;
-    rotateX.onChange((val)=>{
-        scene.spiro3D.rotation.fromArray([val, scene.spiro3D.rotation.y, scene.spiro3D.rotation.z]);
-    });
-    var rotateY = visFolder.add(controls, 'rotateY', -Math.PI, Math.PI).step(0.01).name('Rotate Y');
-    rotateY.initialValue = 0;
-    rotateY.onChange((val)=>{
-        scene.spiro3D.rotation.fromArray([scene.spiro3D.rotation.x, val, scene.spiro3D.rotation.z]);
-    });
-    var rotateZ = visFolder.add(controls, 'rotateZ', -Math.PI, Math.PI).step(0.01).name('Rotate Z');
-    rotateZ.initialValue = 0;
-    rotateZ.onChange((val)=>{
-        scene.spiro3D.rotation.fromArray([scene.spiro3D.rotation.x, scene.spiro3D.rotation.y, val]);
-    });*/
+    visFolder.add(controls, 'spiroSpeed', 1, 5).step(0.1).name('Drawing Speed');
     var midiFolder = gui.addFolder('Player Piano');
     midiFolder.open()
     var song = midiFolder.add(controls, 'song', songsToFiles).name('Song');
@@ -128,4 +76,43 @@ const makeGUI = ()=>{
     midiFolder.add(controls, 'play').name('Play');
     midiFolder.add(controls, 'stop').name('Stop');
     //midiFolder.add(controls, 'playback_speed',0.25,2);
+}
+function updateVisType(){
+    for (let l of scene.lineList){
+        l.visible = false;
+    }
+    for (let s of scene.sphereList){
+        s.visible = false;
+    }
+    scene.spiro.visible = false;
+    scene.remove(scene.spiro.arrows);
+    scene.spiro3D.visible = false;
+    scene.floor.visible = true;
+    scene.spiro.ctx.fillRect(0, 0, scene.spiro.ctx.canvas.width, scene.spiro.ctx.canvas.height);
+    switch (controls.visualize){
+        case 'tonnetz':
+            for (let s of scene.sphereList){
+                s.visible = true;
+            }
+            break;
+        case 'spiro':
+            switch (controls.spiroType){
+                case '2D':
+                    console.log('spiro2D');
+                    scene.spiro.visible = true;
+                    //scene.spiro.ctx.fillStyle = '#000000';
+                    break;
+                case 'animate':
+                    console.log('spiroAnimate');
+                    scene.spiro.visible = true;
+                    //scene.spiro.ctx.fillStyle = '#'+scene.floor.material.color.getHexString();
+                    //scene.spiro.ctx.fillRect(0, 0, scene.spiro.ctx.canvas.width, scene.spiro.ctx.canvas.height);
+                    break;
+                case '3D':
+                    console.log("spiro3D");
+                    scene.spiro3D.visible = true;
+                    scene.floor.visible = false;
+        }
+    }
+    moveKeyLabels();
 }

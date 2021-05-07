@@ -160,13 +160,16 @@ function key_status (keyName, status)
                 updateTonnetz(scene,note,true);
             }
             if (controls.visualize == 'spiro'){
-                updateSpiro(scene, note, true, 2);
-            }
-            if (controls.visualize == 'spiroAnimate'){
-                updateSpiro(scene, note, true, 2.5);
-            }
-            if (controls.visualize == 'spiro3D'){
-                updateSpiro(scene, note, true, 3);
+                switch (controls.spiroType){
+                    case '2D':
+                        updateSpiro(scene, note, true, 2);
+                        break;
+                    case 'animate':
+                        updateSpiro(scene, note, true, 2.5);
+                        break;
+                    case '3D':
+                        updateSpiro(scene, note, true, 3);
+                }
             }
         }
         if (status == keyState.note_off){
@@ -185,13 +188,16 @@ function key_status (keyName, status)
                 updateTonnetz(scene,note,false);
             }
             if (controls.visualize == 'spiro'){
-                updateSpiro(scene, note, false, 2);
-            }
-            if (controls.visualize == 'spiroAnimate'){
-                updateSpiro(scene, note, false, 2.5);
-            }
-            if (controls.visualize == 'spiro3D'){
-                updateSpiro(scene, note, false, 3);
+                switch (controls.spiroType){
+                    case '2D':
+                        updateSpiro(scene, note, false, 2);
+                        break;
+                    case 'animate':
+                        updateSpiro(scene, note, false, 2.5);
+                        break;
+                    case '3D':
+                        updateSpiro(scene, note, false, 3);
+                }
             }
         }
         //console.log(chordStack);
@@ -227,7 +233,7 @@ const releaseKeys = () => {
     //console.log(Parser.parseCommands());
     for (keyCode in keys_down){
         if (keys_down[keyCode]){
-            console.log(keyCode);
+            //console.log(keyCode);
             var note = keyCode_to_note(keyCode);
             key_status('_'+note, keyState.note_off);
         }
