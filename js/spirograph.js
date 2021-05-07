@@ -193,8 +193,8 @@ function draw3DGraph(notes){
   }
 
   const scale = 2/(freqSum);
-  let z = -Math.PI*96/0.125*0.0013/2;
-  for (let t = 0; t<Math.PI*96; t+=0.125){
+  let z = -Math.PI*1200/0.125*0.0001/2;
+  for (let t = 0; t<Math.PI*1200; t+=0.125){
     let x = 0;
     let y = 0;
     for (let i = 0; i<freq.length; i++){
@@ -205,7 +205,7 @@ function draw3DGraph(notes){
       x+=scale*Math.sin(r*t*sign)/r;
       y+=scale*Math.cos(r*t*sign)/r;
     }
-    z += 0.0013;
+    z += 0.0001;
     points.push( new THREE.Vector3( x, y,z ) );
   }
   scene.spiro3D.geometry = new THREE.BufferGeometry().setFromPoints( points );
