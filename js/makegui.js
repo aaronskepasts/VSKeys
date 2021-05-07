@@ -64,6 +64,9 @@ const makeGUI = ()=>{
         scene.spiro.customSign = signArr;
     });
 
+    visFolder.add(controls, 'spiroSpeed', 1, 5).step(0.1).name('Drawing Speed');
+    // visFolder.add(controls, 'spiroSpeed', 1, 5).step(0.1).name('Animation Speed');
+
     var spiro3DFolder = gui.addFolder('3D Spirograph Settings');
     spiro3DFolder.open()
     var scale3D = spiro3DFolder.add(controls, 'scale3D', 0.1, 3).step(0.01).name('Scale');
