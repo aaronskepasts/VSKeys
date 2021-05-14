@@ -20,7 +20,7 @@ function addSpirograph(scene, color){
     graph.dir = 'alt';
     graph.customStr = '';
     graph.customSign = [];
-    graph.clock = new THREE.Clock(false);
+    graph.clock = new THREE.Clock();
     graph.freqSum = 0;
     graph.arrows = new THREE.Group();
 
@@ -130,8 +130,6 @@ function updateSpiro(scene, pitch, on, dim){
   }
   if (dim == 3){
     scene.spiro3D.geometry.dispose();
-    s.clock.start();
-    s.clock.elapsedTime = 0;
     if (pitches.length>0) draw3DGraph(pitches);
     else {
       scene.spiro3D.geometry = new THREE.BufferGeometry();
