@@ -3,7 +3,7 @@ function addSpirograph(scene, color){
     const ctx = document.createElement('canvas').getContext('2d');
     ctx.canvas.width = 2048;
     ctx.canvas.height = 2048;
-    ctx.fillStyle = ConvertHexToString(controls.floorColor);
+    ctx.fillStyle = '#000000';//ConvertHexToString(controls.floorColor);
     ctx.lineWidth = 2;
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     const texture = new THREE.CanvasTexture(ctx.canvas);

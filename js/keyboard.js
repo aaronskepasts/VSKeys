@@ -67,7 +67,7 @@ function initialize_tutorial (scene){
         for (let i = 0; i<black_keys.length; i++){
             if(!black_keys[i]){continue;}
             var geometry = new THREE.TextGeometry( black_keys[i], textSettings);
-            var mesh = new THREE.Mesh( geometry, textMat );
+            var mesh = new THREE.Mesh( geometry, whiteText );
             mesh.black = true;
             mesh.scale.fromArray([0.1,0.1,0.1]);
             mesh.rotation.fromArray([-Math.PI/2,0,0]);
@@ -79,7 +79,7 @@ function initialize_tutorial (scene){
             }
         }
         geometry = new THREE.TextGeometry( 'Toggle Octave: CapsLock', textSettings);
-        mesh = new THREE.Mesh( geometry, textMat );
+        mesh = new THREE.Mesh( geometry, whiteText );
         mesh.black = true;
         mesh.scale.fromArray([0.1,0.1,0.1]);
         mesh.rotation.fromArray([-Math.PI/2,0,0]);
@@ -93,6 +93,7 @@ function initialize_tutorial (scene){
 function moveKeyLabels(){
     let h = scene.keyLabels.hideable;
     if (controls.tutorial){
+        /*
         for (let key of scene.keyLabels.children){
             //console.log(key.black, scene.floor.visible);
             if (key.black && !scene.floor.visible){
@@ -102,6 +103,7 @@ function moveKeyLabels(){
                 key.material = blackText;
             key.visible = true;
         }
+        */
         if (controls.octave == 3){
             //console.log(h);
             for (let key of h){key.visible = false;}

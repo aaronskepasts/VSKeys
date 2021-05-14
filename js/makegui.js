@@ -150,7 +150,7 @@ function updateVisType(){
     scene.spiro.visible = false;
     scene.remove(scene.spiro.arrows);
     scene.spiro3D.visible = false;
-    scene.floor.visible = true;
+    //scene.floor.visible = true;
     scene.spiro.ctx.fillRect(0, 0, scene.spiro.ctx.canvas.width, scene.spiro.ctx.canvas.height);
     switch (controls.visualize){
         case 'tonnetz':
@@ -174,7 +174,7 @@ function updateVisType(){
                 case '3D':
                     console.log("spiro3D");
                     scene.spiro3D.visible = true;
-                    scene.floor.visible = false;
+                    //scene.floor.visible = false;
         }
     }
     moveKeyLabels();
