@@ -132,6 +132,7 @@
                 this.rotateZ = 0;
                 this.animateS = false;
                 this.animateP = false;
+                this.animateR = false;
                 this.animateScan = false;
                 this.orbit=false;
                 this.floorColor = 0xf0eff0;
@@ -212,7 +213,7 @@
             camera.position.y = 6.51;
 
             var cameraControls = new THREE.OrbitAndPanControls(camera, renderer.domElement);
-            cameraControls.target.set(6,1.5,-2);
+            cameraControls.target.set(6, 1, -4);
 
             var clock = new THREE.Clock();
             /*
@@ -310,12 +311,14 @@
                 }
                 if (controls.animateS){
                   animateScale(delta);
-                  // console.log(delta);
                 }
                 if (controls.animateP || controls.animateScan){
                   animateParticles(delta);
-                  // console.log(delta);
                 }
+                if (controls.animateR){
+                  animateRotation(delta);
+                }
+
             }
 
             function render( delta )
@@ -386,6 +389,9 @@
                     MIDI.loader.stop();
                     songsToFiles ={//'Lush Life':'lush_life.mid',
                         //"Round Midnight, Thelonious Monk": "Roundmidnight.mid",
+
+                                    "Etudes, Opus 25, Chopin": "chpn_op25_e1.mid",
+                                    "Stairway to Heaven, Led Zeppelin": "LEDZEPPELIN_Stairway_to_heaven_K.mid",
                                     "Moonlight Sonata, Beethoven": "mond_1.mid",
                                     "Etudes, Opus 25, Chopin": "chpn_op25_e1.mid",
                                     //"Body and Soul, John Green": "body_and_soul_oz.mid",
@@ -408,12 +414,12 @@
                                     "Polonaise Ab major, Opus 53, Chopin": "chpn_op53.mid",
                                     "No. 2 - Oriental, Granados": "gra_esp_2.mid",
                                     "Bohemian Rhapsody, Queen": "bohemian1.mid",
-                                    "Autumn Leaves w/ Bass": "Autumn_Leaves_Chords.mid",
-                                    "Autumn Leaves": "AutumnLeavesChords.mid",
-                                    "Aaron Beat Draft": "Final_Beat_Draft.mid",
+                                    // "Autumn Leaves w/ Bass": "Autumn_Leaves_Chords.mid",
+                                    // "Autumn Leaves": "AutumnLeavesChords.mid",
+                                    // "Aaron Beat Draft": "Final_Beat_Draft.mid",
                                     "Aaron A Foggy Day": "Aaron_Foggy_Day.mid",
-                                    "Stairway to Heaven, Led Zeppelin": "LEDZEPPELIN_Stairway_to_heaven_K.mid",
-                                    "Mr. Brightside, The Killers" : "Mr_Brightside.mid"
+                                    // "Mr. Brightside, The Killers" : "Mr_Brightside.mid",
+                                    "This Too Shall Pass, Aaron Skepasts": "this_too_shall_pass.mid"
                                   };
                     makeGUI();
                     var tour = loadTour();

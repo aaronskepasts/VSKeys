@@ -19,7 +19,7 @@ const makeGUI = ()=>{
         updateOctave(val);
         moveKeyLabels();
     });
-    gui.add(controls, 'visualize',{'None':'none','Tonnetz':'tonnetz','Spirograph':'spiro'}).name('Visualization').onChange(updateVisType);
+    gui.add(controls, 'visualize',{'None': 'none', 'Tonnetz':'tonnetz','Spirograph':'spiro'}).name('Visualization').onChange(updateVisType);
     var keyColors = gui.addFolder('Key Colors');
     keyColors.open();
     var noteOnColorControl = keyColors.addColor(controls, 'monochrome').name('Monochrome');
@@ -99,6 +99,19 @@ const makeGUI = ()=>{
               scene.spiro3D.geometry.dispose();
             }
     });
+    let animateR = spiro3DFolder.add(controls, 'animateR').name('Animate Rotation');
+    animateR.onChange((val)=>{
+            if (!val){
+              scene.spiro3D.rotation.fromArray([0,0,0])
+            }
+    });
+    // let animateH = spiro3DFolder.add(controls, 'animateH').name('Animate Hologram');
+    // animateH.onChange((val)=>{
+    //         if (scene.spiro3D.geometry.index != null){
+    //           console.log("w");
+    //           scene.spiro3D.geometry.dispose();
+    //         }
+    // });
     /*
     var rotateX = visFolder.add(controls, 'rotateX', -Math.PI, Math.PI).step(0.1).name('Rotate X');
     rotateX.initialValue = 0;

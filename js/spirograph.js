@@ -41,13 +41,15 @@ function addSpirograph(scene, color){
     const pMat = new THREE.PointsMaterial({ color: color, size: 0.12 });
     var particles = new THREE.Points(geo, pMat);
     particles.visible = false;
-    particles.position.fromArray([6, 1, -15]);
+    particles.position.fromArray([6, 1, -7]);
     scene.spiro3D = particles;
     scene.spiro3D.color = color;
     // set animation of spiro3D
     scene.spiro3D.t = 0.005;
     scene.spiro3D.s = [0.3, 0.3, 0.3];
     scene.spiro3D.shrink = false;
+    // z for hologram animation
+    scene.spiro3D.z = 0;
 
     scene.add(particles);
 
@@ -204,7 +206,7 @@ function draw3DGraph(notes){
   scene.spiro3D.freq = freq;
   scene.spiro3D.freqSum = freqSum;
   const scale = 4.5/(freqSum);
-  let z = 0;
+  let z = -Math.PI*1200/0.125*0.00035/2;
   for (let t = 0; t<Math.PI*1200; t+=0.125){
     let x = 0;
     let y = 0;
@@ -348,10 +350,10 @@ function animateParticles(delta){
     const points = [];
     let time = scene.spiro3D.t
     const scale = 4.5/(freqSum);
-    let z = 0;
-    let scantime = scene.spiro.clock.getElapsedTime();
+    let z = -Math.PI*1200/0.125*0.00035/2;
+    let scantime = 2*scene.spiro.clock.getElapsedTime();
     let scanWidth = 2;
-    let scanBack = (10.55-scanWidth)/2*(1+Math.sin(scantime));
+    let scanBack = (10.55-scanWidth)/2*(1+Math.sin(scantime)) + z;
     let scanFront = scanBack+scanWidth;
     //console.log(scantime);
     for (let t = 0+time; t<Math.PI*1200+time; t+=0.125){
@@ -372,4 +374,49 @@ function animateParticles(delta){
     if (controls.animateP)scene.spiro3D.t += 0.005;
     scene.spiro3D.geometry = new THREE.BufferGeometry().setFromPoints( points );
   }
+}
+
+function animateRotation(delta){
+  scene.spiro3D.rotation.fromArray([scene.spiro3D.rotation.x, scene.spiro3D.rotation.y + delta, scene.spiro3D.rotation.z])
+}
+
+function animateHologram(delta){
+  // console.log(scene.spiro3D.geometry);
+  let freq = scene.spiro3D.freq;
+  if (freq == undefined){
+    scene.spiro3D.geometry.dispose();
+    return;
+  }
+  console.log(scene.spiro3D.geometry);
+  // let freqSum = scene.spiro3D.freqSum;
+  // if (freq.length > 0){
+  //   let alt = scene.spiro.dir == 'alt';
+  //   let custom = scene.spiro.dir == 'custom';
+  //   // store spiro3D points and set start point
+  //   const points = [];
+  //   const scale = 4.5/(freqSum);
+  //   let z = scene.spiro3D.z;
+  //   for (let t = 0; t<Math.PI*200; t+=0.125){
+  //     let x = 0;
+  //     let y = 0;
+  //     for (let i = 0; i<freq.length; i++){
+  //       let r = freq[i];
+  //       let sign = 1;
+  //       if (custom && i<signArr.length) sign = signArr[i];
+  //       if (alt) sign = i%2 == 0 ? 1: -1;
+  //       x+=scale*Math.sin(r*t*sign)/r;
+  //       y+=scale*Math.cos(r*t*sign)/r;
+  //     }
+  //     z += 0.00035;
+  //     if (z > Math.PI*1200*0.00035){
+  //       z = 0;
+  //     }
+  //     points.push( new THREE.Vector3( x, y,z ) );
+  //   }
+  //   scene.spiro3D.z += delta;
+  //   if (scene.spiro3D.z > Math.PI*200*0.00035){
+  //     scene.spiro3D.z = 0
+  //   }
+  //   scene.spiro3D.geometry = new THREE.BufferGeometry().setFromPoints( points );
+  // }
 }
