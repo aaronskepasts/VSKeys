@@ -83,7 +83,13 @@ const makeGUI = ()=>{
             if (!val){
               scene.spiro3D.scale.fromArray([controls.scale3D,controls.scale3D,controls.scale3D]);
             }
-            scene.spiro3D.s = [0.1, 0.1, 0.1]
+            scene.spiro3D.s = [0.1, 0.1, 0.1];
+    });
+    let animateR = spiro3DFolder.add(controls, 'animateR').name('Animate Rotation');
+    animateR.onChange((val)=>{
+            if (!val){
+              scene.spiro3D.rotation.fromArray([0,0,0])
+            }
     });
     let animateP = spiro3DFolder.add(controls, 'animateP').name('Animate Particles');
     animateP.onChange((val)=>{
@@ -97,12 +103,6 @@ const makeGUI = ()=>{
             if (scene.spiro3D.geometry.index != null){
               //console.log("w");
               scene.spiro3D.geometry.dispose();
-            }
-    });
-    let animateR = spiro3DFolder.add(controls, 'animateR').name('Animate Rotation');
-    animateR.onChange((val)=>{
-            if (!val){
-              scene.spiro3D.rotation.fromArray([0,0,0])
             }
     });
     // let animateH = spiro3DFolder.add(controls, 'animateH').name('Animate Hologram');

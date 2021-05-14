@@ -179,7 +179,7 @@ const addTonnetz = (scene) => {
 
     const chord = 2*dist*Math.sin(Math.PI/segments);
     const height = rt3o2*chord;
-    const center = new THREE.Vector3(5.5,-7,1);
+    const center = new THREE.Vector3(5.5,-7,-3);
 
     const off = new THREE.MeshPhongMaterial( {color: 0xffffff} );
     const r = 0.05;

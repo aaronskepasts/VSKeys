@@ -377,7 +377,7 @@ function animateParticles(delta){
 }
 
 function animateRotation(delta){
-  scene.spiro3D.rotation.fromArray([scene.spiro3D.rotation.x, scene.spiro3D.rotation.y + delta, scene.spiro3D.rotation.z])
+  scene.spiro3D.rotation.fromArray([scene.spiro3D.rotation.x, scene.spiro3D.rotation.y + delta/2, scene.spiro3D.rotation.z])
 }
 
 function animateHologram(delta){

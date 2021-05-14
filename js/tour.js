@@ -109,19 +109,25 @@ function loadTour(){
         buttons: buttons,
       });
       tour.addStep({
-        title: '3D Animated Scale',
+        title: '3D Animate Scale',
         text: 'Make chords swell to their full scale.',
         attachTo: { element: '#Td_animate_scale',on: 'left'},
         buttons: buttons,
       });
       tour.addStep({
-        title: '3D Animated Particles',
+        title: '3D Animate Rotation',
+        text: 'Spin the graph.',
+        attachTo: { element: '#Td_animate_rot',on: 'left'},
+        buttons: buttons,
+      });
+      tour.addStep({
+        title: '3D Animate Particles',
         text: 'Make the particles swirl within the graph.',
         attachTo: { element: '#Td_animate_particles',on: 'left'},
         buttons: buttons,
       });
       tour.addStep({
-        title: '3D Animated Scan',
+        title: '3D Animate Scan',
         text: 'Scan through the graph back and forth to see cross sections.',
         attachTo: { element: '#Td_animate_scan',on: 'left'},
         buttons: buttons,
@@ -144,7 +150,7 @@ function labelGuiElements(){
   gui = gui.filter((val)=>{return val.className!='folder';});
   //console.log(gui.length);
   let idList = ['instrument','orbit','keyboard','controls','octave','vis_type', 'key_color','monochrome','color_scheme','spiro_settings','spiro_type',
-    'spiro_sign','custom_spiro_sign','draw_speed','3d_settings','Td_scale','Td_animate_scale','Td_animate_particles','Td_animate_scan','midi','play']
+    'spiro_sign','custom_spiro_sign','draw_speed','Td_settings','Td_scale','Td_animate_scale','Td_animate_rot','Td_animate_particles','Td_animate_scan','midi','play']
   for (let i = 0; i< gui.length; i++){
     gui[i].id = idList[i];
   }

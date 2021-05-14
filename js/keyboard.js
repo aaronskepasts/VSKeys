@@ -93,17 +93,17 @@ function initialize_tutorial (scene){
 function moveKeyLabels(){
     let h = scene.keyLabels.hideable;
     if (controls.tutorial){
-        /*
         for (let key of scene.keyLabels.children){
             //console.log(key.black, scene.floor.visible);
+            /*
             if (key.black && !scene.floor.visible){
                 key.material = whiteText;
                 //console.log("blackKey");
             } else 
-                key.material = blackText;
+            key.material = blackText;
+            */
             key.visible = true;
         }
-        */
         if (controls.octave == 3){
             //console.log(h);
             for (let key of h){key.visible = false;}
