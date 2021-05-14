@@ -128,6 +128,8 @@ function updateSpiro(scene, pitch, on, dim){
   }
   if (dim == 3){
     scene.spiro3D.geometry.dispose();
+    s.clock.start();
+    s.clock.elapsedTime = 0;
     if (pitches.length>0) draw3DGraph(pitches);
     else {
       scene.spiro3D.geometry = new THREE.BufferGeometry();
@@ -307,14 +309,14 @@ function animateArrows(delta, freq, alt, custom, signArr){
 }
 
 function animateScale(delta){
-  let s = scene.spiro3D.scale
-  let scale = scene.spiro3D.s
+  let s = scene.spiro3D.scale;
+  let scale = scene.spiro3D.s;
   let freq = scene.spiro3D.freq;
-  let f = 1.5
-  s.fromArray(scale)
+  //let f = 1.5
+  s.fromArray(scale);
   if (freq == undefined){
-    scene.spiro3D.s = [0.3, 0.3, 0.3];
-  } else if (scale[0] < 1.0){
+    scene.spiro3D.s = [0.1, 0.1, 0.1];
+  } else if (scale[0] < controls.scale3D){
     for (let i = 0; i < scale.length; i++){
        scale[i] += delta;
     }
@@ -347,7 +349,14 @@ function animateParticles(delta){
     let time = scene.spiro3D.t
     const scale = 4.5/(freqSum);
     let z = 0;
+    let scantime = scene.spiro.clock.getElapsedTime();
+    let scanWidth = 2;
+    let scanBack = (10.55-scanWidth)/2*(1+Math.sin(scantime));
+    let scanFront = scanBack+scanWidth;
+    //console.log(scantime);
     for (let t = 0+time; t<Math.PI*1200+time; t+=0.125){
+      z += 0.00035;
+      if (controls.animateScan && (z<scanBack || z>scanFront)) continue;
       let x = 0;
       let y = 0;
       for (let i = 0; i<freq.length; i++){
@@ -358,10 +367,9 @@ function animateParticles(delta){
         x+=scale*Math.sin(r*t*sign)/r;
         y+=scale*Math.cos(r*t*sign)/r;
       }
-      z += 0.00035;
       points.push( new THREE.Vector3( x, y,z ) );
     }
-    scene.spiro3D.t += 0.005;
+    if (controls.animateP)scene.spiro3D.t += 0.005;
     scene.spiro3D.geometry = new THREE.BufferGeometry().setFromPoints( points );
   }
 }

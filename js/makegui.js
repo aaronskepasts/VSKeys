@@ -9,13 +9,17 @@ const makeGUI = ()=>{
     let orbit = gui.add(controls, 'orbit').name('Orbit');
     orbit.onChange((val)=>{cameraControls.autoRotate = val});
     //gui.add(controls, 'key_attack_time',1, 10).step(1);
-    gui.add(controls, 'tutorial').name('Show Key Layout').onChange(moveKeyLabels);
+    gui.add(controls,'visPiano').name('Show Keyboard').onChange(function(val){
+        scene.piano.visible = val;
+        key_labels.setValue(val);
+    });
+    var key_labels = gui.add(controls, 'tutorial').name('Show Key Layout').onChange(moveKeyLabels);
     var octave = gui.add(controls, 'octave',0 , 3).step(1).name('Octave');
     octave.onChange((val)=>{
         updateOctave(val);
         moveKeyLabels();
     });
-    gui.add(controls, 'visualize',{'Tonnetz':'tonnetz','Spirograph':'spiro'}).name('Visualization').onChange(updateVisType);
+    gui.add(controls, 'visualize',{'None':'none','Tonnetz':'tonnetz','Spirograph':'spiro'}).name('Visualization').onChange(updateVisType);
     var keyColors = gui.addFolder('Key Colors');
     keyColors.open();
     var noteOnColorControl = keyColors.addColor(controls, 'monochrome').name('Monochrome');
@@ -71,20 +75,27 @@ const makeGUI = ()=>{
     spiro3DFolder.open()
     var scale3D = spiro3DFolder.add(controls, 'scale3D', 0.1, 3).step(0.01).name('Scale');
     scale3D.onChange((val)=>{
-        console.log(scale3D);
+        //console.log(scale3D);
         scene.spiro3D.scale.fromArray([val, val, val]);
     });
     let animateS = spiro3DFolder.add(controls, 'animateS').name('Animate Scale');
     animateS.onChange((val)=>{
             if (!val){
-              scene.spiro3D.scale.fromArray([1,1,1]);
+              scene.spiro3D.scale.fromArray([controls.scale3D,controls.scale3D,controls.scale3D]);
             }
-            scene.spiro3D.s = [0.3, 0.3, 0.3]
+            scene.spiro3D.s = [0.1, 0.1, 0.1]
     });
     let animateP = spiro3DFolder.add(controls, 'animateP').name('Animate Particles');
     animateP.onChange((val)=>{
             if (scene.spiro3D.geometry.index != null){
-              console.log("w");
+              //console.log("w");
+              scene.spiro3D.geometry.dispose();
+            }
+    });
+    let scan = spiro3DFolder.add(controls, 'animateScan').name('Animate Scan');
+    scan.onChange((val)=>{
+            if (scene.spiro3D.geometry.index != null){
+              //console.log("w");
               scene.spiro3D.geometry.dispose();
             }
     });

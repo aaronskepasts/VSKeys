@@ -117,6 +117,7 @@
                 this.playback_speed = 1.0;
                 this.key_max_rotation = 0.72;
                 this.octave = 1;
+                this.visPiano = true;
                 this.instrument = 'AMSynth';
                 this.song = "mond_1.mid";
                 this.key_color_scheme = 'monochrome';
@@ -131,6 +132,7 @@
                 this.rotateZ = 0;
                 this.animateS = false;
                 this.animateP = false;
+                this.animateScan = false;
                 this.orbit=false;
                 this.floorColor = 0xf0eff0;
                 this.sphereJump = 4;
@@ -271,6 +273,8 @@
             function prepare_scene( collada )
             {
                 collada.scene.traverse(initialize_keys);
+                scene.piano = collada.scene;
+                //console.log(scene.piano);
                 scene.add(collada.scene);
                 var skyGeo = new THREE.SphereGeometry(100, 25, 25);
                 var material = new THREE.MeshPhongMaterial({ color: 0x555555});
@@ -308,7 +312,7 @@
                   animateScale(delta);
                   // console.log(delta);
                 }
-                if (controls.animateP){
+                if (controls.animateP || controls.animateScan){
                   animateParticles(delta);
                   // console.log(delta);
                 }
@@ -383,6 +387,7 @@
                     songsToFiles ={//'Lush Life':'lush_life.mid',
                         //"Round Midnight, Thelonious Monk": "Roundmidnight.mid",
                                     "Moonlight Sonata, Beethoven": "mond_1.mid",
+                                    "Etudes, Opus 25, Chopin": "chpn_op25_e1.mid",
                                     //"Body and Soul, John Green": "body_and_soul_oz.mid",
                                     "For Elise, Beethoven": "for_elise_by_beethoven.mid",
                                     "Prelude and Fugue in C major BWV 846, Bach": "bach_846.mid",
@@ -400,7 +405,6 @@
                                     "Sonata No. 11 A major (K331, First Movement), Mozart": "mz_331_1.mid",
                                     "March - Song of the Lark, Tchaikovsky":"ty_maerz.mid",
                                     "Piano Sonata in C major, Hoboken, Haydn": "haydn_35_1.mid",
-                                    "Etudes, Opus 25, Chopin": "chpn_op25_e1.mid",
                                     "Polonaise Ab major, Opus 53, Chopin": "chpn_op53.mid",
                                     "No. 2 - Oriental, Granados": "gra_esp_2.mid",
                                     "Bohemian Rhapsody, Queen": "bohemian1.mid",
@@ -436,10 +440,10 @@
     </script>
 
     <div id="info" style='color:grey'>
-        Interactive 3D Piano Harmony Visualizer made with <a href="http://threejs.org" target="_blank">three.js</a><br />
-        Uses <a href="http://mudcu.be/midi-js/" target="_blank">MIDI.js</a> and <a href="https://tonejs.github.io/" target="_blank">Tone.js</a>.<br>
+        Interactive 3D Piano Harmony Visualizer made with <a href="http://threejs.org" target="_blank">three.js</a>,<a href="http://mudcu.be/midi-js/" target="_blank">MIDI.js</a>, and <a href="https://tonejs.github.io/" target="_blank">Tone.js</a>.<br>
+        Here is our <a href='https://github.com/DeegZC/VSKeys'>GitHub Repo</a> and <a href='https://github.com/DeegZC/VSKeys/blob/master/VSKeys_Report.pdf'>Writeup</a>. <br>
         Codebase adapted from <a href="https://github.com/reality3d/3d-piano-player" target="_blank">3D Piano Player</a> by
-        <a href="http://www.twitter.com/reality3d/" target="_blank">Borja Morales</a>
+        <a href="http://www.twitter.com/reality3d/" target="_blank">Borja Morales</a>.
     </div>
 	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
     </body>
