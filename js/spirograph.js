@@ -269,7 +269,7 @@ function animateSpiro(delta){
   for (let t = start; t<end; t+=increment){
     let [x,y] = para(t);
     ctx.lineTo(x,y);
-    let pal = ctx.palette.copy(col).lerpHSL(black, 1- ((t-start)/(end-start)));
+    let pal = ctx.palette.copy(col).lerpHSL(white, 1- ((t-start)/(end-start)));
     ctx.strokeStyle = '#'+  pal.getHexString();
     //console.log(pal.getHexString());
     ctx.stroke();
