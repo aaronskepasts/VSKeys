@@ -12,8 +12,8 @@ function loadTour(){
       tour.addStep({
         title: 'Welcome to VSKeys!',
         text: 'VSKeys is an interactive 3D piano keyboard for visualizing harmony with interesting colors and geometry.<br>\
-        <strong style="text-decoration:underline">WARNING</strong>: After changing any settings in the GUI, remember to remove keyboard focus from that setting by clicking elsewhere on the GUI.\
-        Forgetting this step can lead to settings changing while you play.',
+        <strong style="text-decoration:underline">WARNING</strong>: 1) After changing any settings in the GUI, remember to remove keyboard focus from that setting by clicking elsewhere on the GUI.\
+        Forgetting this step can lead to settings changing while you play. 2) Unless you have a non-ghosting keyboard, there are hardware limits on the number of keys you can press at the same time so beware of large or dense chords.',
         attachTo: {element: 'body', on: 'top'},
         buttons: [{action() {return this.next();},text: 'Next'}],
         arrow: false,
