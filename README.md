@@ -1,14 +1,13 @@
 # VSKeys
 Check out the demo live at https://aaronskepasts.github.io/VSKeys/ 
 
-## Quick settings to see all main features of the project!
-** only change those that are mentioned **
+## Quick settings to try all main features of the project!
 - Visualization: Tonnetz; Song "Etude's Chopin"; Play
 - Visualization: Spirograph; Type: 2D; Song "Stairway to Heaven"; Play
 - Visualization: Spirograph; Type: 3D; Song "Moonlight Sonata"; Play; Toggle Orbit
 - Visualization: Spirograph; Type: 2D Animated; Play different chords on your keyboard to see how the harmony spirograph works!
 
-Also be encouraged to check out a music video I created using the visualizer here: https://www.youtube.com/channel/UCJmrUAvEm9YIPoG3BQm2alA
+I also created a music video using the visualizer here: https://www.youtube.com/channel/UCJmrUAvEm9YIPoG3BQm2alA
 
 ### About the project
 
