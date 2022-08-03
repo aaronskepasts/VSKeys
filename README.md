@@ -12,5 +12,4 @@ Also be encouraged to check out a music video I created using the visualizer her
 
 ### About the project
 
-VSKeys is a 3D Piano player demo and visualizer. This project uses three.js, Tone.js, and MIDI.js to anaylyze music data and visualize it into 3D space. This project features two visualizers. The first is a Tonnetz, which is a tool created by Leonhard Euler to show harmonic relationships between notes. Euler was fascinated by the mathematics behind music theory and inspired us to use the math behind harmony to create our own harmony visualizer we call "Harmony Spirograph". Both tools are responsive to live keyboard input or songs via MIDI input. If you would like to learn more about this project, 
-
+VSKeys is a 3D Piano player demo and visualizer. This project uses three.js, Tone.js, and MIDI.js to anaylyze music data and visualize it into 3D space. This project features two visualizers. The first is a Tonnetz, which is a tool created by Leonhard Euler to show harmonic relationships between notes. Euler was fascinated by the mathematics behind music theory and inspired us to use the math behind harmony to create our own harmony visualizer we call "Harmony Spirograph". Both tools are responsive to live keyboard input or songs via MIDI input. If you would like to learn more about this project, please read the VSKeys_Report.pdf in the project files.
