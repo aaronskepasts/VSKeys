@@ -120,12 +120,12 @@
                 this.visPiano = true;
                 this.instrument = 'AMSynth';
                 this.song = "mond_1.mid";
-                this.key_color_scheme = 'chromatic';
+                this.key_color_scheme = 'fifths';
                 this.monochrome = [ 128, 0, 255, 1.0 ];
                 //this.monochrome = [ 255, 255, 255, 1.0 ];
                 this.gui;
-                this.visualize = 'tonnetz';
-                this.spiroType = '2D';
+                this.visualize = 'spiro';
+                this.spiroType = '3D';
                 this.scale3D = 1;
                 this.rotateX = 0;
                 this.rotateY = 0;
@@ -426,6 +426,7 @@
                                     "This Too Shall Pass, Aaron Skepasts": "this_too_shall_pass.mid"
                                   };
                     makeGUI();
+                    updateVisType()
                     var tour = loadTour();
                     tour.start();
                 });

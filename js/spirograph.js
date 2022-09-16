@@ -41,7 +41,7 @@ function addSpirograph(scene, color){
     const pMat = new THREE.PointsMaterial({ color: color, size: 0.12 });
     var particles = new THREE.Points(geo, pMat);
     particles.visible = false;
-    particles.position.fromArray([6, 1, -7]);
+    particles.position.fromArray([6, 4, -7]);
     scene.spiro3D = particles;
     scene.spiro3D.color = color;
     // set animation of spiro3D
